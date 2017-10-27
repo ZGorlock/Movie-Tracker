@@ -1,0 +1,1 @@
+The Mobile Application module for the Movie Tracker Project.
