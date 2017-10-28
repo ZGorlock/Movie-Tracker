@@ -1,1 +1,1 @@
-The Server module for the Movie Tracker Project.
+The server.Server module for the Movie Tracker Project.
