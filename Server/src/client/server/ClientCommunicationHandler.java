@@ -1,12 +1,11 @@
 /*
  * File:    ClientCommunicationHandler.java
- * Package: client
+ * Package: client.server
  * Author:  Zachary Gill
  */
 
-package client;
+package client.server;
 
-import communication.CommunicationHandler;
 import utility.CryptoUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

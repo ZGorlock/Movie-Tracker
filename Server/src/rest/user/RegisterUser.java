@@ -1,10 +1,10 @@
 /*
  * File:    RegisterUser.java
- * Package: rest
+ * Package: rest.user
  * Author:  Zachary Gill
  */
 
-package rest;
+package rest.user;
 
 import communication.CommunicationHandler;
 import database.DatabaseAccess;
@@ -68,7 +68,7 @@ public class RegisterUser
     /**
      * Registers a user on the server.
      *
-     * @param user  The username of the user being registered.
+     * @param user      The username of the user being registered.
      * @param passHash  The password hash of the user being registered encrypted with the AES key of a communication channel.
      * @param signature The client signature of the unencrypted password hash.
      * @param commId    The id of the communication channel being used to encrypt the password hash.
@@ -163,22 +163,20 @@ public class RegisterUser
             
             //generate new user id
             
-            String idString = "";
+            int id = -1;
             boolean unique = false;
             while (!unique) {
-                long id;
                 if (producer.equals("y")) {
-                    id = (long) ((new SecureRandom().nextDouble() * 100000) + 1);
+                    id = (int) ((new SecureRandom().nextDouble() * 100000) + 1);
                 } else {
-                    id = (long) ((new SecureRandom().nextDouble() * 268435455L) + 100001);
+                    id = (int) ((new SecureRandom().nextDouble() * 268435455) + 100001);
                 }
-                idString = Long.toString(id);
                 
                 PreparedStatement s2 = DatabaseAccess.getPreparedStatement("SELECT COUNT(id) FROM user WHERE id = ?");
                 if (s2 == null) {
                     return null;
                 }
-                s2.setString(1, idString);
+                s2.setInt(1, id);
                 
                 FormattedResultSet r2 = DatabaseAccess.querySqlFormatResponse(s2);
                 DatabaseAccess.closeStatement(s2);
@@ -194,7 +192,7 @@ public class RegisterUser
             if (s2 == null) {
                 return null;
             }
-            s2.setString(1, idString);
+            s2.setInt(1, id);
             s2.setString(2, user);
             s2.setString(3, decryptedPassHash);
             s2.setString(4, email);
@@ -214,7 +212,7 @@ public class RegisterUser
             DatabaseAccess.commitChanges();
             logger.info("POST successful: User registered");
             return Response.ok()
-                    .header("userId", idString)
+                    .header("userId", id)
                     .header("message", "Success: User registered").build();
             
         } catch (Exception e) {

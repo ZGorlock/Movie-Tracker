@@ -1,10 +1,10 @@
 /*
  * File:    AuthorizeUser.java
- * Package: rest
+ * Package: rest.user
  * Author:  Zachary Gill
  */
 
-package rest;
+package rest.user;
 
 import communication.CommunicationHandler;
 import database.DatabaseAccess;
@@ -145,7 +145,7 @@ public class AuthorizeUser
             
             //generate auth token
             
-            String token = AuthToken.generateAuthToken(idString);
+            String token = AuthToken.generateAuthToken(Integer.valueOf(idString));
             String encryptedToken = CommunicationHandler.encryptCommunication(commId, token);
             
             

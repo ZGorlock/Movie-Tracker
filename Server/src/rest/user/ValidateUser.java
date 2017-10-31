@@ -1,10 +1,10 @@
 /*
  * File:    ValidateUser.java
- * Package: rest
+ * Package: rest.user
  * Author:  Zachary Gill
  */
 
-package rest;
+package rest.user;
 
 import communication.CommunicationHandler;
 import database.DatabaseAccess;

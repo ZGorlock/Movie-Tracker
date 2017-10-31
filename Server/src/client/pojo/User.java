@@ -1,19 +1,20 @@
 /*
  * File:    User.java
- * Package: client
+ * Package: client.pojo
  * Author:  Zachary Gill
  */
 
-package client;
+package client.pojo;
 
 public class User
 {
-    private String userId;
+    private int userId;
     private String username;
     private String email;
     private String firstName;
     private String lastName;
     private boolean producer;
+    
     
     public User()
     {
@@ -22,17 +23,16 @@ public class User
     @Override
     public String toString()
     {
-        return "userId: " + userId + ", username: " + username + ", email: " + email + ", firstName: " + firstName + ", lastName: " + lastName + ", producer: " + producer;
+        return "userId: " + getUserId() + ", username: " + getUsername() + ", email: " + getEmail() + ", firstName: " + getFirstName() + ", lastName: " + getLastName() + ", producer: " + isProducer();
     }
     
     
-    
-    public String getUserId()
+    public int getUserId()
     {
         return userId;
     }
     
-    public void setUserId(String userId)
+    public void setUserId(int userId)
     {
         this.userId = userId;
     }

@@ -42,9 +42,9 @@ public final class AuthToken
     //Static Fields
     
     /**
-     * A map of the auth tokens distributed by the server to the hex id of the users they authorize.
+     * A map of the auth tokens distributed by the server to the id of the users they authorize.
      */
-    private static final Map<AuthToken, String> authTokens = new HashMap<>();
+    private static final Map<AuthToken, Integer> authTokens = new HashMap<>();
     
     /**
      * A map of the tokens to the auth tokens they represent.
@@ -111,7 +111,7 @@ public final class AuthToken
      * @return The auth token.
      */
     @SuppressWarnings("StatementWithEmptyBody")
-    public static synchronized String generateAuthToken(String userId)
+    public static synchronized String generateAuthToken(int userId)
     {
         String token;
         while (authTokens.containsKey(token = UUID.randomUUID().toString())) {
@@ -157,10 +157,10 @@ public final class AuthToken
      * Verifies an auth token is still valid and should not be renewed.
      *
      * @param token  The auth token.
-     * @param userId The hex id of the user that owns the auth token.
+     * @param userId The id of the user that owns the auth token.
      * @return Whether the auth token is still valid and should not be renewed.
      */
-    public static synchronized boolean verifyAuthTokenOwner(String token, String userId)
+    public static synchronized boolean verifyAuthTokenOwner(String token, int userId)
     {
         if (!authTokenExpired(token)) {
             AuthToken authToken = authTokenTokens.get(token);
@@ -170,18 +170,49 @@ public final class AuthToken
     }
     
     /**
-     * Determines the hex id of the user that owns an auth token.
+     * Determines the id of the user that owns an auth token.
      *
      * @param token The auth token.
-     * @return The hex id of the owner of the auth token.
+     * @return The id of the owner of the auth token.
      */
-    public static synchronized String getAuthTokenOwner(String token)
+    public static synchronized int getAuthTokenOwner(String token)
     {
         AuthToken authToken = authTokenTokens.get(token);
         if (authToken == null) {
-            return "";
+            return -1;
         }
         return authTokens.get(authToken);
+    }
+    
+    /**
+     * Determines the id of the user that owns an auth token.
+     *
+     * @param authToken The auth token.
+     * @param commId        The id of the communication channel used to encrypt the auth token.
+     * @return The id of the owner of the auth token.
+     */
+    public static int getAuthTokenOwnerFromToken(String authToken, long commId)
+    {
+        //validate communication channel
+        if (!CommunicationHandler.hasCommunicationId(commId)) {
+            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
+            return -1;
+        }
+        
+        //decrypt auth token
+        String decryptedAuthToken = CommunicationHandler.decryptCommunication(commId, authToken);
+        if (decryptedAuthToken.isEmpty()) {
+            logger.warn("POST failed: Communication channel at: {} could not decrypt the auth token", commId);
+            return -1;
+        }
+        
+        //verify the auth token
+        if (authTokenExpired(decryptedAuthToken)) {
+            logger.warn("POST failed: Auth token: {} is expired", decryptedAuthToken);
+            return -1;
+        }
+        
+        return getAuthTokenOwner(decryptedAuthToken);
     }
     
     /**
@@ -200,11 +231,9 @@ public final class AuthToken
      *
      * @param authToken     The auth token.
      * @param commId        The id of the communication channel used to encrypt the auth token.
-     * @param userId        The expected user id of the caller.
-     * @param transactionId The transaction id of the transaction.
      * @return A failure response if there was an error validating the auth token or null if the validation was successful.
      */
-    public static Response validateAuthTokenForPost(String authToken, long commId, String userId, String transactionId)
+    public static Response validateAuthTokenForPost(String authToken, long commId)
     {
         //validate communication channel
         if (!CommunicationHandler.hasCommunicationId(commId)) {
@@ -226,14 +255,10 @@ public final class AuthToken
         }
         
         //verify caller
-        if (!verifyAuthTokenOwner(decryptedAuthToken, userId)) {
-            if (Long.valueOf(userId) > 100000) {
-                logger.warn("POST failed: Auth token: {} does not belong to an admin", decryptedAuthToken);
-                return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The auth token used does not belong to an admin").build();
-            } else {
-                logger.warn("POST failed: Auth token: {} does not belong to the author", decryptedAuthToken);
-                return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The auth token used does not belong to the author").build();
-            }
+        int owner = getAuthTokenOwner(decryptedAuthToken);
+        if (owner > 100000) {
+            logger.warn("POST failed: Auth token: {} does not belong to a producer", decryptedAuthToken);
+            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The auth token used does not belong to a producer").build();
         }
         
         return null;

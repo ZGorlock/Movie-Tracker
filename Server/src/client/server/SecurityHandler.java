@@ -1,14 +1,13 @@
 /*
  * File:    SecurityHandler.java
- * Package: client
+ * Package: client.server
  * Author:  Zachary Gill
  */
 
-package client;
+package client.server;
 
 import utility.CryptoUtility;
 
-import java.rmi.activation.ActivationGroup_Stub;
 import java.security.KeyPair;
 import java.security.PublicKey;
 

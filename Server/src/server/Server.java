@@ -52,6 +52,11 @@ public class Server
      */
     public static final long KEY_UPDATE_FREQUENCY = 86400000;
     
+    /**
+     * The size in bytes of the buffer used for file transfers.
+     */
+    public static final int BUFFER_SIZE = 16384;
+    
     
     //Static Fields
     
