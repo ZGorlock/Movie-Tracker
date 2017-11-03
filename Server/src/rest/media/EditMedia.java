@@ -158,7 +158,7 @@ public class EditMedia
                         fos.write(buffer, 0, read);
                     }
                 } catch (IOException e) {
-                    logger.error("{} | POST failed: Image could not be written");
+                    logger.error("POST failed: Image could not be written");
                     logger.error(Server.stackTrace(e));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Image could not be written").build();
                 }
@@ -173,19 +173,19 @@ public class EditMedia
             }
             s2.setString(1, title);
             s2.setString(2, type);
-            s2.setString(4, description);
-            s2.setString(5, genre);
-            s2.setString(6, actors);
-            s2.setString(7, image);
-            s2.setString(8, showtimes);
-            s2.setString(9, rating);
-            s2.setInt(10, year);
-            s2.setInt(11, mediaId);
+            s2.setString(3, description);
+            s2.setString(4, genre);
+            s2.setString(5, actors);
+            s2.setString(6, image);
+            s2.setString(7, showtimes);
+            s2.setString(8, rating);
+            s2.setInt(9, year);
+            s2.setInt(10, mediaId);
             
             if (!DatabaseAccess.executeSql(s2)) {
                 DatabaseAccess.rollbackChanges();
                 DatabaseAccess.closeStatement(s2);
-                logger.warn("{} | POST failed: Media: {} by: {} could not be updated in the database", title, producerId);
+                logger.warn("POST failed: Media: {} by: {} could not be updated in the database", title, producerId);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Media: " + title + " by: " + producerId + " could not be updated in the database").build();
             }
             DatabaseAccess.closeStatement(s2);
@@ -194,7 +194,7 @@ public class EditMedia
             //response
             
             DatabaseAccess.commitChanges();
-            logger.info("{} | POST successful: Media edited");
+            logger.info("POST successful: Media edited");
             return Response.ok().header("message", "Success: Media edited").build();
             
         } catch (Exception e) {

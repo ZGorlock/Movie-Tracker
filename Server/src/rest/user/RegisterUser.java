@@ -169,7 +169,7 @@ public class RegisterUser
                 if (producer.equals("y")) {
                     id = (int) ((new SecureRandom().nextDouble() * 100000) + 1);
                 } else {
-                    id = (int) ((new SecureRandom().nextDouble() * 268435455) + 100001);
+                    id = (int) ((new SecureRandom().nextDouble() * 2146483646) + 100001);
                 }
                 
                 PreparedStatement s2 = DatabaseAccess.getPreparedStatement("SELECT COUNT(id) FROM user WHERE id = ?");

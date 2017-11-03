@@ -136,7 +136,7 @@ public class AddMedia
             boolean unique = false;
             int id = -1;
             while (!unique) {
-                id = (int) ((new SecureRandom().nextDouble() * 268435455) + 1);
+                id = (int) ((new SecureRandom().nextDouble() * 2147483646) + 1);
         
                 PreparedStatement s2 = DatabaseAccess.getPreparedStatement("SELECT COUNT(id) FROM media WHERE id = ?");
                 if (s2 == null) {
@@ -156,8 +156,8 @@ public class AddMedia
             
             String image = "";
             if (file != null) {
-                image = UUID.randomUUID().toString() + '.' + fileDetail.getType();
-                File tmpDir = new File("/home/movie-tracker/images/" + image);
+                image = UUID.randomUUID().toString() + fileDetail.getFileName().substring(fileDetail.getFileName().indexOf('.'));
+                File tmpDir = new File(Server.IMAGES_DIR + image);
                 Files.createFile(Paths.get(tmpDir.getAbsolutePath()));
     
                 //receive the file transfer
@@ -177,7 +177,7 @@ public class AddMedia
                         fos.write(buffer, 0, read);
                     }
                 } catch (IOException e) {
-                    logger.error("{} | POST failed: Image could not be written");
+                    logger.error("POST failed: Image could not be written");
                     logger.error(Server.stackTrace(e));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Image could not be written").build();
                 }
@@ -205,7 +205,7 @@ public class AddMedia
             if (!DatabaseAccess.executeSql(s2)) {
                 DatabaseAccess.rollbackChanges();
                 DatabaseAccess.closeStatement(s2);
-                logger.warn("{} | POST failed: Media: {} by: {} could not be added to the database", title, producerId);
+                logger.warn("POST failed: Media: {} by: {} could not be added to the database", title, producerId);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Media: " + title + " by: " + producerId + " could not be added to the database").build();
             }
             DatabaseAccess.closeStatement(s2);
@@ -214,7 +214,7 @@ public class AddMedia
             //response
             
             DatabaseAccess.commitChanges();
-            logger.info("{} | POST successful: Media added");
+            logger.info("POST successful: Media added");
             return Response.ok().header("message", "Success: Media added").build();
             
         } catch (Exception e) {

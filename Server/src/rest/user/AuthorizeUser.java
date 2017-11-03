@@ -64,7 +64,7 @@ public class AuthorizeUser
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response registerUser(
+    public Response authorizeUser(
             @FormDataParam("user") String user,
             @FormDataParam("passHash") String passHash,
             @FormDataParam("signature") String signature,

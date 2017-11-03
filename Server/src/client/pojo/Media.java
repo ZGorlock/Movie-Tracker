@@ -10,17 +10,17 @@ import java.io.File;
 
 public class Media
 {
-    private int mediaId;
-    private String title;
-    private String type;
-    private int producerId;
-    private String description;
-    private String genre;
-    private String actors;
-    private File image;
-    private String showtimes;
-    private String rating;
-    private int year;
+    private int mediaId = 0;
+    private String title = "";
+    private String type = "";
+    private int producerId = 0;
+    private String description = "";
+    private String genre = "";
+    private String actors = "";
+    private File image = null;
+    private String showtimes = "";
+    private String rating = "";
+    private int year = 0;
     
     
     public Media()

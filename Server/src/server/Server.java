@@ -48,6 +48,11 @@ public class Server
     public static final String BASE_URI = "http://0.0.0.0:4444/";
     
     /**
+     * The images dir on the server.
+     */
+    public static final String IMAGES_DIR = "/home/movie-tracker/images/";
+    
+    /**
      * The number of milliseconds in between server key updates.
      */
     public static final long KEY_UPDATE_FREQUENCY = 86400000;

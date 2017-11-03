@@ -108,29 +108,46 @@ public class DeleteMedia
                 logger.warn("POST ignored: Media: {} does not belong to user: {}", mediaId, producerId);
                 return Response.status(Response.Status.UNAUTHORIZED).header("message", "Failure:  Media: " + mediaId + " does not belong to user: " + producerId).build();
             }
-            
-            
-            //delete the Media from the database
-            
-            PreparedStatement s2 = DatabaseAccess.getPreparedStatement("DELETE FROM media WHERE id = ?");
+    
+    
+            //remove Subscriptions to Media from the database
+    
+            PreparedStatement s2 = DatabaseAccess.getPreparedStatement("DELETE FROM subscription WHERE mediaId = ?");
             if (s2 == null) {
                 return null;
             }
             s2.setInt(1, mediaId);
-            
+    
             if (!DatabaseAccess.executeSql(s2)) {
                 DatabaseAccess.rollbackChanges();
                 DatabaseAccess.closeStatement(s2);
-                logger.warn("{} | POST failed: Media: {} by: {} could not be delete from the database", mediaId, producerId);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Media: " + mediaId + " by: " + producerId + " could not be deleted from the database").build();
+                logger.warn("POST failed: Subscriptions associated with Media: {} could not be removed from the database", mediaId);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Subscriptions associated with Media: " + mediaId + " could not be removed from the database").build();
             }
             DatabaseAccess.closeStatement(s2);
+            
+            
+            //delete the Media from the database
+            
+            PreparedStatement s3 = DatabaseAccess.getPreparedStatement("DELETE FROM media WHERE id = ?");
+            if (s3 == null) {
+                return null;
+            }
+            s3.setInt(1, mediaId);
+            
+            if (!DatabaseAccess.executeSql(s3)) {
+                DatabaseAccess.rollbackChanges();
+                DatabaseAccess.closeStatement(s3);
+                logger.warn("POST failed: Media: {} by: {} could not be delete from the database", mediaId, producerId);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: Media: " + mediaId + " by: " + producerId + " could not be deleted from the database").build();
+            }
+            DatabaseAccess.closeStatement(s3);
             
             
             //response
             
             DatabaseAccess.commitChanges();
-            logger.info("{} | POST successful: Media deleted");
+            logger.info("POST successful: Media deleted");
             return Response.ok().header("message", "Success: Media deleted").build();
             
         } catch (Exception e) {

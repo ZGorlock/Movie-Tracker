@@ -96,7 +96,7 @@ public class RetrieveMedia
             if (s2 == null) {
                 return null;
             }
-            s.setInt(1, mediaId);
+            s2.setInt(1, mediaId);
             FormattedResultSet r2 = DatabaseAccess.querySqlFormatResponse(s2);
             DatabaseAccess.closeStatement(s2);
             
@@ -115,14 +115,17 @@ public class RetrieveMedia
     
             //open a stream for the file transfer
     
-            File imageFile = new File(image);
-            FileInputStream is;
-            try {
-                is = new FileInputStream(imageFile);
-            } catch (FileNotFoundException e) {
-                logger.error("{} | GET failed: {} could not be opened", imageFile.getName());
-                logger.error(Server.stackTrace(e));
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: " + imageFile.getName() + " could not be opened").build();
+            FileInputStream is = null;
+            File imageFile = null;
+            if (!image.isEmpty()) {
+                imageFile = new File(Server.IMAGES_DIR + image);
+                try {
+                    is = new FileInputStream(imageFile);
+                } catch (FileNotFoundException e) {
+                    logger.error("GET failed: {} could not be opened", imageFile.getName());
+                    logger.error(Server.stackTrace(e));
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: " + imageFile.getName() + " could not be opened").build();
+                }
             }
             
             //response
@@ -135,7 +138,7 @@ public class RetrieveMedia
             json.put("description", description);
             json.put("genre", genre);
             json.put("actors", actors);
-            json.put("image", imageFile.getName());
+            json.put("image", (imageFile == null) ? "" : imageFile.getName());
             json.put("showtimes", showtimes);
             json.put("rating", rating);
             json.put("year", year);
@@ -143,7 +146,7 @@ public class RetrieveMedia
             logger.info("POST successful: Media retrieved");
             
             return Response.ok(is)
-                    .header("Content-Disposition", "attachment; filename=" + imageFile.getName() + "; size=" + imageFile.length() + ';')
+                    .header("Content-Disposition", "attachment; filename=" + ((imageFile == null) ? "" : imageFile.getName()) + "; size=" + ((imageFile == null) ? 0 : imageFile.length()) + ';')
                     .header("mediaInfo", json.toString())
                     .header("message", "Success: Media retrieved").build();
             

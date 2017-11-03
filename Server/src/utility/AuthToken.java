@@ -264,4 +264,36 @@ public final class AuthToken
         return null;
     }
     
+    
+    /**
+     * Validates an auth token.
+     *
+     * @param authToken     The auth token.
+     * @param commId        The id of the communication channel used to encrypt the auth token.
+     * @return A failure response if there was an error validating the auth token or null if the validation was successful.
+     */
+    public static Response validateAuthToken(String authToken, long commId)
+    {
+        //validate communication channel
+        if (!CommunicationHandler.hasCommunicationId(commId)) {
+            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
+            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel was never opened").build();
+        }
+        
+        //decrypt auth token
+        String decryptedAuthToken = CommunicationHandler.decryptCommunication(commId, authToken);
+        if (decryptedAuthToken.isEmpty()) {
+            logger.warn("POST failed: Communication channel at: {} could not decrypt the auth token", commId);
+            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel could not decrypt the auth token").build();
+        }
+        
+        //verify the auth token
+        if (authTokenExpired(decryptedAuthToken)) {
+            logger.warn("POST failed: Auth token: {} is expired", decryptedAuthToken);
+            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The auth token used is expired").build();
+        }
+        
+        return null;
+    }
+    
 }
