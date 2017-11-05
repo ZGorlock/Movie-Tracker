@@ -37,9 +37,9 @@ public class HomeActivity extends AppCompatActivity {
                     Intent displaySuggestions = new Intent(HomeActivity.this, SuggestionsActivity.class);
                     startActivity(displaySuggestions);
                     return true;
-                case R.id.navigation_settings:
-                    Intent displaySettings = new Intent(HomeActivity.this, SettingsActivity.class);
-                    startActivity(displaySettings);
+                case R.id.navigation_favorites:
+                    Intent displayFavorites = new Intent(HomeActivity.this, FavoritesActivity.class);
+                    startActivity(displayFavorites);
                     return true;
             }
             return false;
@@ -81,7 +81,11 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
+        if(id == R.id.displaySettings)
+        {
+            Intent displaySettings = new Intent(HomeActivity.this, SettingsActivity.class);
+            startActivity(displaySettings);
+        }
         return super.onOptionsItemSelected(item);
     }
 
