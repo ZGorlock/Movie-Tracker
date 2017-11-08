@@ -15,6 +15,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import client.*;
+import client.server.ServerHandler;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -24,6 +26,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText mUserName = (EditText) findViewById(R.id.editTextUsername);
     private EditText mPassword = (EditText) findViewById(R.id.editTextPassword);
     private EditText mPasswordConfirm = (EditText) findViewById(R.id.editTextPasswordConfirm);
+    private EditText mEmail = (EditText) findViewById(R.id.editTextEmail);
     private View mProgressView = findViewById(R.id.register_form);
     private View mRegisterFormView = findViewById(R.id.progressBar);
     private UserRegisterTask mAuthTask = null;
@@ -56,6 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
         String username = mUserName.getText().toString();
         String password = mPassword.getText().toString();
         String passwordConfirm = mPasswordConfirm.getText().toString();
+        String email = mEmail.getText().toString();
 
 
         mFirstName.setError(null);
@@ -63,6 +67,7 @@ public class RegisterActivity extends AppCompatActivity {
         mUserName.setError(null);
         mPassword.setError(null);
         mPasswordConfirm.setError(null);
+        mEmail.setError(null);
 
         View focusView = null;
         boolean cancel = false;
@@ -74,12 +79,12 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mFirstName;
             cancel = true;
         }
-        else if(!validName(firstName))
-        {
-            mFirstName.setError(getString(R.string.error_invalid_name));
-            focusView = mFirstName;
-            cancel = true;
-        }
+//        else if(!validName(firstName))
+//        {
+//            mFirstName.setError(getString(R.string.error_invalid_name));
+//            focusView = mFirstName;
+//            cancel = true;
+//        }
 
         //Check lastName
         if ((TextUtils.isEmpty(lastName)))
@@ -88,12 +93,12 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mLastName;
             cancel = true;
         }
-        else if(!validName(lastName))
-        {
-            mLastName.setError(getString(R.string.error_invalid_name));
-            focusView = mLastName;
-            cancel = true;
-        }
+//        else if(!validName(lastName))
+//        {
+//            mLastName.setError(getString(R.string.error_invalid_name));
+//            focusView = mLastName;
+//            cancel = true;
+//        }
 
         //Check Username
         if ((TextUtils.isEmpty(username)))
@@ -102,12 +107,12 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mUserName;
             cancel = true;
         }
-        else if(!validUsername(username))
-        {
-            mUserName.setError(getString(R.string.error_invalid_username));
-            focusView = mUserName;
-            cancel = true;
-        }
+//        else if(!validUsername(username))
+//        {
+//            mUserName.setError(getString(R.string.error_invalid_username));
+//            focusView = mUserName;
+//            cancel = true;
+//        }
 
         //Check Password
         if(TextUtils.isEmpty(password))
@@ -116,12 +121,12 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mPassword;
             cancel = true;
         }
-        else if(!validPassword(password))
-        {
-            mPassword.setError(getString(R.string.error_invalid_password));
-            focusView = mPassword;
-            cancel = true;
-        }
+//        else if(!validPassword(password))
+//        {
+//            mPassword.setError(getString(R.string.error_invalid_password));
+//            focusView = mPassword;
+//            cancel = true;
+//        }
 
         //Check ConfirmPassword
         if(TextUtils.isEmpty(passwordConfirm))
@@ -130,12 +135,26 @@ public class RegisterActivity extends AppCompatActivity {
             focusView = mPasswordConfirm;
             cancel = true;
         }
-        else if(!TextUtils.equals(password,passwordConfirm))
+//        else if(!TextUtils.equals(password,passwordConfirm))
+//        {
+//            mPasswordConfirm.setError(getString(R.string.error_password_mismatch));
+//            focusView = mPasswordConfirm;
+//            cancel = true;
+//        }
+        if(TextUtils.isEmpty(email))
         {
-            mPasswordConfirm.setError(getString(R.string.error_password_mismatch));
-            focusView = mPasswordConfirm;
+            mEmail.setError(getString(R.string.error_field_required));
+            focusView = mEmail;
             cancel = true;
+
         }
+//        else if(!validEmail(email))
+//        {
+//            mEmail.setError(getString(R.string.error_invalid_email));
+//            focusView = mEmail;
+//            cancel = true;
+//
+//        }
 
 
         if (cancel) {
@@ -165,6 +184,8 @@ public class RegisterActivity extends AppCompatActivity {
     {
         return false;
     }
+
+    private boolean validEmail(String email) { return false; }
 
 
     /**
@@ -212,22 +233,26 @@ public class RegisterActivity extends AppCompatActivity {
 
         private final String mUsername;
         private final String mPassword;
+        private final String mEmail;
+        private final String mFirstName;
+        private final String mLastName;
 
-        UserRegisterTask(String username, String password) {
+        UserRegisterTask(String username, String password, String email, String firstname, String lastname) {
             mUsername = username;
             mPassword = password;
+            mEmail = email;
+            mFirstName = firstname;
+            mLastName = lastname;
+
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
+
+            ServerHandler.registerUser(mUsername, mPassword, mEmail, mFirstName, mLastName, false);
+
 
 
             // TODO: register the new account here.
