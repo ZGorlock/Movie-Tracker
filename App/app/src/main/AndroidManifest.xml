@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="team12.movietracker">
+    <uses-sdk android:minSdkVersion="19"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
     <!-- <uses-permission android:name="android.permission.GET_ACCOUNTS" /> -->
@@ -88,6 +90,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="team12.movietracker.HomeActivity" />
         </activity>
+        <activity
+            android:name=".ShowDetailActivity"
+            android:label="@string/title_activity_show_detail"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

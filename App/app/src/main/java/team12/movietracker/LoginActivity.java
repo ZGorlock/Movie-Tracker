@@ -33,7 +33,9 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
+//import client.*;
 
 /**
  * A login screen that offers login via username/password.

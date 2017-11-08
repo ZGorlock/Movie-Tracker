@@ -14,6 +14,7 @@
     <string name="error_incorrect_password">This password is incorrect</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_inuse_username">This username is already in use</string>
+    <string name="error_invalid_email">This email is invalid</string>
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
@@ -194,4 +195,7 @@
     <string name="settings_menu">Settings</string>
     <string name="title_favorites">Favorites</string>
     <string name="title_activity_favorites">FavoritesActivity</string>
+    <string name="title_activity_show_detail">ShowDetailActivity</string>
+    <string name="textviewTitle">TextViewTitle</string>
+    <string name="textviewDescription">TextViewDescription</string>
 </resources>
