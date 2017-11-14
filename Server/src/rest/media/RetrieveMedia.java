@@ -28,7 +28,11 @@ import javax.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,7 +70,7 @@ public class RetrieveMedia
      */
     @POST
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_OCTET_STREAM)
+    @Produces(MediaType.TEXT_PLAIN)
     public Response registerUser(
             @FormDataParam("mediaId") int mediaId)
     {
@@ -113,20 +117,21 @@ public class RetrieveMedia
             String year = r2.getStringResult("year", 0);
     
     
-            //open a stream for the file transfer
+            //dump image for transfer
     
-            FileInputStream is = null;
+            String imageDump = "";
             File imageFile = null;
             if (!image.isEmpty()) {
                 imageFile = new File(Server.IMAGES_DIR + image);
                 try {
-                    is = new FileInputStream(imageFile);
-                } catch (FileNotFoundException e) {
+                    imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(imageFile.getAbsolutePath())));
+                } catch (FileNotFoundException e1) {
                     logger.error("GET failed: {} could not be opened", imageFile.getName());
-                    logger.error(Server.stackTrace(e));
+                    logger.error(Server.stackTrace(e1));
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).header("message", "Failure: " + imageFile.getName() + " could not be opened").build();
                 }
             }
+            
             
             //response
             
@@ -145,9 +150,10 @@ public class RetrieveMedia
             
             logger.info("POST successful: Media retrieved");
             
-            return Response.ok(is)
-                    .header("Content-Disposition", "attachment; filename=" + ((imageFile == null) ? "" : imageFile.getName()) + "; size=" + ((imageFile == null) ? 0 : imageFile.length()) + ';')
+            return Response.ok()
                     .header("mediaInfo", json.toString())
+                    .header("image", (imageFile == null) ? "" : imageFile.getName())
+                    .header("imageDump", imageDump)
                     .header("message", "Success: Media retrieved").build();
             
         } catch (Exception e) {

@@ -35,7 +35,7 @@ import java.util.List;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-import client.*;
+//import client.*;
 
 /**
  * A login screen that offers login via username/password.

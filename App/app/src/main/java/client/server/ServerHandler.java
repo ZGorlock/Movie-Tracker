@@ -6,42 +6,43 @@
 
 package client.server;
 
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
-import org.glassfish.jersey.media.multipart.file.FileDataBodyPart;
-import org.glassfish.jersey.server.ResourceConfig;
+import android.app.Application;
+import android.util.Log;
+
+import com.squareup.okhttp.MultipartBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+import com.sun.jna.platform.FileUtils;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 
 import client.pojo.Media;
 import client.pojo.User;
 import client.utility.CryptoUtility;
 
-public class ServerHandler
+public class ServerHandler extends Application
 {
     
     //Constants
@@ -67,12 +68,12 @@ public class ServerHandler
     /**
      * The resource configuration for the Client connection to the server.
      */
-    private static final ResourceConfig resourceConfig = new ResourceConfig();
+    //private static final ResourceConfig resourceConfig = new ResourceConfig();
     
     /**
      * The client connection to the server.
      */
-    private static Client client = null;
+    private static OkHttpClient client = null;
     
     /**
      * The DSA keys of the system.
@@ -108,8 +109,7 @@ public class ServerHandler
     public static void setupServerHandler()
     {
         //set up the client connection
-        resourceConfig.register(MultiPartFeature.class);
-        client = ClientBuilder.newClient(resourceConfig);
+        client = new OkHttpClient();
     
         //generate the unique keys for the client
         generateKeys();
@@ -134,11 +134,6 @@ public class ServerHandler
     {
         //close the client connection
         closeCommunicationChannel(serverCommId);
-    
-        try {
-            client.close();
-        } catch (Exception ignored) {
-        }
     }
     
     /**
@@ -149,15 +144,9 @@ public class ServerHandler
      */
     private static boolean printResponse(Response response)
     {
-        String message = response.getHeaderString("message");
-        if ((response == null) || (response.getStatus() != Response.Status.OK.getStatusCode())) {
-            
-            System.out.println("Server: Returned response: " + response.getStatus() + " - " + ((message == null) ? "  Server: Encountered an exception" : message));
-            return false;
-        } else {
-            System.out.println("Server: Returned response: " + response.getStatus() + " - " + ((message == null) ? "  Server: Encountered an exception" : message));
-            return true;
-        }
+        String message = response.header("message");
+        System.out.println("Server: Returned response: " + response.code() + " - " + ((message == null) ? "  Server: Encountered an exception" : message));
+        return response.code() == 200;
     }
     
     
@@ -171,11 +160,11 @@ public class ServerHandler
         if (encryptedPassHash.isEmpty()) {
             return false;
         }
-        
+
         userId = registerUser(username, encryptedPassHash, signature, serverCommId, email, firstName, lastName, producer);
         return userId != -1;
     }
-    
+
     public static User validateUser(String username, String password)
     {
         String passHash = CryptoUtility.hashSHA512(password);
@@ -184,46 +173,46 @@ public class ServerHandler
         if (encryptedPassHash.isEmpty()) {
             return null;
         }
-        
+
         String response = validateUser(username, encryptedPassHash, signature, serverCommId);
         boolean success = (response != null) && !response.isEmpty();
-        
+
         if (success) {
             System.out.println("User: " + username + " validated");
-            
+
             User user = new User();
             try {
                 org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
                 JSONObject json = (JSONObject) parser.parse(response);
-                
+
                 user.setUserId(Integer.valueOf((String) json.get("userId")));
                 user.setUsername((String) json.get("userName"));
                 user.setEmail((String) json.get("email"));
                 user.setFirstName((String) json.get("firstName"));
                 user.setLastName((String) json.get("lastName"));
                 user.setProducer("y".equals(json.get("producer")));
-                
+
                 return user;
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            
+
         } else {
             System.out.println("User: " + username + " validated");
         }
         return null;
     }
-    
+
     public static String authorizeUser(String username, String password)
     {
         String passHash = CryptoUtility.hashSHA512(password);
         String signature = ClientCommunicationHandler.signCommunication(serverCommId, passHash);
         String encryptedPassHash = ClientCommunicationHandler.encryptCommunication(serverCommId, passHash);
-        
+
         authorizeUser(username, encryptedPassHash, signature, serverCommId);
         return authToken;
     }
-    
+
     /**
      * Adds a Media.
      * @param media The Media to add.
@@ -233,7 +222,7 @@ public class ServerHandler
     {
         return mediaAdd(media.getImage(), media.getTitle(), media.getType(), media.getDescription(), media.getGenre(), media.getActors(), media.getShowtimes(), media.getRating(), String.valueOf(media.getYear()));
     }
-    
+
     /**
      * Edits a Media.
      * @param mediaId The id of the Media to edit.
@@ -244,7 +233,7 @@ public class ServerHandler
     {
         return mediaEdit(String.valueOf(mediaId), media.getImage(), media.getTitle(), media.getType(), media.getDescription(), media.getGenre(), media.getActors(), media.getShowtimes(), media.getRating(), String.valueOf(media.getYear()));
     }
-    
+
     /**
      * Deletes a Media.
      * @param mediaId The id of the Media to delete.
@@ -254,7 +243,7 @@ public class ServerHandler
     {
         return mediaDelete(String.valueOf(mediaId));
     }
-    
+
     /**
      * Queries Media.
      * @param media The Media containing the query parameters.
@@ -266,25 +255,25 @@ public class ServerHandler
         if (response.isEmpty()) {
             return new ArrayList<>();
         }
-    
+
         List<Integer> resultList = new ArrayList<>();
-        
+
         try {
             org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
             JSONObject json = (JSONObject) parser.parse(response);
-            
+
             JSONArray results = (JSONArray) json.get("results");
             for (Object o : results) {
                 resultList.add(Integer.valueOf(o.toString()));
             }
-        
+
             return resultList;
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return new ArrayList<>();
     }
-    
+
     /**
      * Retrieves a Media.
      * @param mediaId The id of the Media to retrieve.
@@ -296,12 +285,12 @@ public class ServerHandler
         if (response.isEmpty()) {
             return null;
         }
-        
+
         Media media = new Media();
         try {
             org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
             JSONObject json = (JSONObject) parser.parse(response);
-    
+
             media.setMediaId(Integer.valueOf((String) json.get("mediaId")));
             media.setTitle((String) json.get("title"));
             media.setType((String) json.get("type"));
@@ -313,14 +302,14 @@ public class ServerHandler
             media.setShowtimes((String) json.get("showtimes"));
             media.setRating((String) json.get("rating"));
             media.setYear(Integer.valueOf((String) json.get("year")));
-        
+
             return media;
         } catch (ParseException e) {
             e.printStackTrace();
         }
         return null;
     }
-    
+
     /**
      * Adds a Subscription.
      * @param mediaId The Media to add a subscription for.
@@ -330,7 +319,7 @@ public class ServerHandler
     {
         return subscriptionAdd(String.valueOf(mediaId));
     }
-    
+
     /**
      * Removes a Subscription.
      * @param mediaId The Media to remove a subscription for.
@@ -340,7 +329,7 @@ public class ServerHandler
     {
         return subscriptionRemove(String.valueOf(mediaId));
     }
-    
+
     /**
      * Gets Subscriptions of the user.
      * @return A list of media id's that the user is subscribed to.
@@ -351,18 +340,18 @@ public class ServerHandler
         if (response.isEmpty()) {
             return new ArrayList<>();
         }
-    
+
         List<Integer> subscriptionList = new ArrayList<>();
-    
+
         try {
             org.json.simple.parser.JSONParser parser = new org.json.simple.parser.JSONParser();
             JSONObject json = (JSONObject) parser.parse(response);
-        
+
             JSONArray results = (JSONArray) json.get("subscriptions");
             for (Object o : results) {
                 subscriptionList.add(Integer.valueOf(o.toString()));
             }
-        
+
             return subscriptionList;
         } catch (ParseException e) {
             e.printStackTrace();
@@ -378,61 +367,54 @@ public class ServerHandler
      *
      * @return The id of the communication channel that was opened, -1 if there was an error.
      */
-    private static long openCommunicationChannel()
+    public static long openCommunicationChannel()
     {
         String url = BASE_URI + "openCommunicationChannel";
-        
+
         PublicKey rsaPublicKey = rsaKeys.getPublic();
         PrivateKey rsaPrivateKey = rsaKeys.getPrivate();
         String rsaPublicKeyStore = CryptoUtility.storeRSAPublicKey(rsaPublicKey);
-        
+
         PublicKey dsaPublicKey = dsaKeys.getPublic();
         String dsaPublicKeyStore = CryptoUtility.storeDSAPublicKey(dsaPublicKey);
-        
+
         long commId;
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("rsaPublicKeyStore", rsaPublicKeyStore)
-                    .field("dsaPublicKeyStore", dsaPublicKeyStore);
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return -1;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("rsaPublicKeyStore", rsaPublicKeyStore)
+                    .addFormDataPart("dsaPublicKeyStore", dsaPublicKeyStore).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
-                return -1;
+                return serverCommId;
             }
-            
-            commId = Long.valueOf(response.getHeaderString("commId"));
-            String aesKeyStore = response.getHeaderString("aesKeyStore");
-            String rsaServerPublicKeyStore = response.getHeaderString("rsaServerPublicKeyStore");
-            String dsaServerPublicKeyStore = response.getHeaderString("dsaServerPublicKeyStore");
-            
+
+            commId = Long.valueOf(response.header("commId"));
+            String aesKeyStore = response.header("aesKeyStore");
+            String rsaServerPublicKeyStore = response.header("rsaServerPublicKeyStore");
+            String dsaServerPublicKeyStore = response.header("dsaServerPublicKeyStore");
+
             String decryptedAESKeyStore = CryptoUtility.decryptRSA(aesKeyStore, rsaPrivateKey);
             SecretKey aesKey = CryptoUtility.readAESSecret(decryptedAESKeyStore);
             PublicKey rsaServerPublicKey = CryptoUtility.readRSAPublicKey(rsaServerPublicKeyStore);
             PublicKey dsaServerPublicKey = CryptoUtility.readDSAPublicKey(dsaServerPublicKeyStore);
-            
+
             if (!ClientCommunicationHandler.openCommunicationChannel(commId, aesKey, rsaServerPublicKey, dsaServerPublicKey)) {
                 return -1;
             }
-            
-        } catch (IOException e) {
+
+        } catch (Exception e) {
+            System.out.println(e.toString() + " : \n" + Arrays.toString(e.getStackTrace()));
             return -1;
         }
-        
+
         serverCommId = commId;
-        return commId;
+        return serverCommId;
     }
-    
+
     /**
      * Closes a communication channel with the server.
      *
@@ -442,44 +424,37 @@ public class ServerHandler
     private static boolean closeCommunicationChannel(long commId)
     {
         String url = BASE_URI + "closeCommunicationChannel";
-        
+
         String aesKeyStore = ClientCommunicationHandler.getCommunicationChannelKey(commId);
         if (aesKeyStore.isEmpty()) {
             return false;
         }
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("commId", String.valueOf(commId))
-                    .field("aesKeyStore", aesKeyStore);
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("commId", String.valueOf(commId))
+                    .addFormDataPart("aesKeyStore", aesKeyStore).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return false;
             }
-            
+
             if (!ClientCommunicationHandler.closeCommunicationChannel(commId)) {
                 return false;
             }
-            
-        } catch (IOException e) {
+
+        } catch (Exception e) {
+            System.out.println(e.toString() + " : \n" + Arrays.toString(e.getStackTrace()));
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * Registers a user on the server.
      *
@@ -492,41 +467,34 @@ public class ServerHandler
     private static int registerUser(String user, String passHash, String signature, long commId, String email, String firstName, String lastName, boolean producer)
     {
         String url = BASE_URI + "registerUser";
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("user", user)
-                    .field("passHash", passHash)
-                    .field("signature", signature)
-                    .field("commId", String.valueOf(commId))
-                    .field("email", email)
-                    .field("firstName", firstName)
-                    .field("lastName", lastName)
-                    .field("producer", producer ? "y" : "n");
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return -1;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("user", user)
+                    .addFormDataPart("passHash", passHash)
+                    .addFormDataPart("signature", signature)
+                    .addFormDataPart("commId", String.valueOf(commId))
+                    .addFormDataPart("email", email)
+                    .addFormDataPart("firstName", firstName)
+                    .addFormDataPart("lastName", lastName)
+                    .addFormDataPart("producer", producer ? "y" : "n").build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return -1;
             }
-            
-            return Integer.valueOf(response.getHeaderString("userId"));
-            
-        } catch (IOException e) {
+
+            return Integer.valueOf(response.header("userId"));
+
+        } catch (Exception e) {
+            System.out.println(e.toString() + " : \n" + Arrays.toString(e.getStackTrace()));
             return -1;
         }
     }
-    
+
     /**
      * Validates a user with the server.
      *
@@ -539,37 +507,29 @@ public class ServerHandler
     private static String validateUser(String user, String passHash, String signature, long commId)
     {
         String url = BASE_URI + "validateUser";
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("user", user)
-                    .field("passHash", passHash)
-                    .field("signature", signature)
-                    .field("commId", String.valueOf(commId));
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return null;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("user", user)
+                    .addFormDataPart("passHash", passHash)
+                    .addFormDataPart("signature", signature)
+                    .addFormDataPart("commId", String.valueOf(commId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return null;
             }
-            
-            return response.getHeaderString("userInfo");
-            
-        } catch (IOException e) {
+
+            return response.header("userInfo");
+
+        } catch (Exception e) {
             return null;
         }
     }
-    
+
     /**
      * Authorizes a user with the server.
      *
@@ -582,347 +542,293 @@ public class ServerHandler
     private static boolean authorizeUser(String user, String passHash, String signature, long commId)
     {
         String url = BASE_URI + "authorizeUser";
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("user", user)
-                    .field("passHash", passHash)
-                    .field("signature", signature)
-                    .field("commId", String.valueOf(commId));
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("user", user)
+                    .addFormDataPart("passHash", passHash)
+                    .addFormDataPart("signature", signature)
+                    .addFormDataPart("commId", String.valueOf(commId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return false;
             }
-            
-            String encryptedAuthToken = response.getHeaderString("authToken");
+
+            String encryptedAuthToken = response.header("authToken");
             authToken = ClientCommunicationHandler.decryptCommunication(commId, encryptedAuthToken);
             return true;
-            
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static boolean mediaAdd(File image, String title, String type, String description, String genre, String actors, String showtimes, String rating, String year)
     {
         String url = BASE_URI + "addMedia";
-        
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-        
+
+        String imageDump = "";
+        String imageType = "";
+        //TODO images
+//        try {
+//            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+//        } catch (IOException e1) {
+//            imageDump = "";
+//        }
+//        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+
         try {
-            FileDataBodyPart filePart = new FileDataBodyPart("file", image);
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = (FormDataMultiPart) formMultiPart
-                    .field("title", title)
-                    .field("type", type)
-                    .field("description", description)
-                    .field("genre", genre)
-                    .field("actors", actors)
-                    .field("showtimes", showtimes)
-                    .field("rating", rating)
-                    .field("year", year)
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId))
-                    .bodyPart(filePart);
-        
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-        
-            formMultiPart.close();
-            multiPart.close();
-    
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("title", title)
+                    .addFormDataPart("type", type)
+                    .addFormDataPart("description", description)
+                    .addFormDataPart("genre", genre)
+                    .addFormDataPart("actors", actors)
+                    .addFormDataPart("imageDump", imageDump)
+                    .addFormDataPart("imageType", imageType)
+                    .addFormDataPart("showtimes", showtimes)
+                    .addFormDataPart("rating", rating)
+                    .addFormDataPart("year", year)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             return printResponse(response);
-    
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static boolean mediaEdit(String mediaId, File image, String title, String type, String description, String genre, String actors, String showtimes, String rating, String year)
     {
         String url = BASE_URI + "editMedia";
-    
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-    
+
+        String imageDump = "";
+        String imageName = "";
+        String imageType = "";
+        //TODO images
+//        try {
+//            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+//        } catch (IOException e1) {
+//            imageDump = "";
+//        }
+//        imageName = image.getName();
+//        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+
         try {
-            FileDataBodyPart filePart = new FileDataBodyPart("file", image);
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = (FormDataMultiPart) formMultiPart
-                    .field("mediaId", mediaId)
-                    .field("title", title)
-                    .field("type", type)
-                    .field("description", description)
-                    .field("genre", genre)
-                    .field("actors", actors)
-                    .field("showtimes", showtimes)
-                    .field("rating", rating)
-                    .field("year", year)
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId))
-                    .bodyPart(filePart);
-        
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-        
-            formMultiPart.close();
-            multiPart.close();
-        
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("mediaId", mediaId)
+                    .addFormDataPart("title", title)
+                    .addFormDataPart("type", type)
+                    .addFormDataPart("description", description)
+                    .addFormDataPart("genre", genre)
+                    .addFormDataPart("actors", actors)
+                    .addFormDataPart("imageDump", imageDump)
+                    .addFormDataPart("imageName", imageName)
+                    .addFormDataPart("imageType", imageType)
+                    .addFormDataPart("showtimes", showtimes)
+                    .addFormDataPart("rating", rating)
+                    .addFormDataPart("year", year)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             return printResponse(response);
-        
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static boolean mediaDelete(String mediaId)
     {
         String url = BASE_URI + "deleteMedia";
-    
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-    
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("mediaId", mediaId)
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId));
-        
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-        
-            formMultiPart.close();
-            multiPart.close();
-        
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("mediaId", mediaId)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             return printResponse(response);
-        
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static String mediaQuery(String title, String type, String producerId, String description, String genre, String actors, String showtimes, String rating, String year)
     {
         String url = BASE_URI + "queryMedia";
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("title", title)
-                    .field("type", type)
-                    .field("producerId", producerId)
-                    .field("description", description)
-                    .field("genre", genre)
-                    .field("actors", actors)
-                    .field("showtimes", showtimes)
-                    .field("rating", rating)
-                    .field("year", year);
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("title", title)
+                    .addFormDataPart("type", type)
+                    .addFormDataPart("producerId", producerId)
+                    .addFormDataPart("description", description)
+                    .addFormDataPart("genre", genre)
+                    .addFormDataPart("actors", actors)
+                    .addFormDataPart("showtimes", showtimes)
+                    .addFormDataPart("rating", rating)
+                    .addFormDataPart("year", year).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
+            if (!printResponse(response)) {
                 return "";
             }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
-            return response.getHeaderString("results");
-            
-        } catch (IOException e) {
+
+            return response.header("results");
+
+        } catch (Exception e) {
             return "";
         }
     }
-    
+
     public static String mediaRetrieve(String mediaId)
     {
         String url = BASE_URI + "retrieveMedia";
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("mediaId", mediaId);
-        
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return "";
-            }
-        
-            formMultiPart.close();
-            multiPart.close();
-        
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("mediaId", mediaId).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return "";
             }
-        
-            Matcher dispositionMatcher = CONTENT_DISPOSITION_PATTERN.matcher(response.getHeaderString("Content-Disposition"));
-            if (!dispositionMatcher.matches()) {
-                return "";
-            }
-            
-            File imageStore = new File("images" + File.separator + dispositionMatcher.group("filename"));
-            
-            if (!imageStore.exists()) {
-                File dir = new File("images");
-                if (!dir.exists() || !dir.isDirectory()) {
-                    Files.createDirectory(Paths.get(dir.getAbsolutePath()));
-                }
-                Files.createFile(Paths.get(imageStore.getAbsolutePath()));
-                FileOutputStream fos = null;
-                InputStream is = null;
-    
-                try {
-                    fos = new FileOutputStream(imageStore);
-                    is = (InputStream) response.getEntity();
-        
-                    int read;
-                    byte[] buffer = new byte[BUFFER_SIZE];
-                    while ((read = is.read(buffer, 0, buffer.length)) != -1) {
-                        fos.write(buffer, 0, read);
-                    }
-                    fos.flush();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (fos != null) {
-                        fos.close();
-                    }
-                    if (is != null) {
-                        is.close();
-                    }
-                }
-            }
-    
-            return response.getHeaderString("mediaInfo");
-        
+
+            //TODO images
+//            String imageName = response.header("image");
+//            if (imageName != null) {
+//
+//                File imageStore = new File("images" + File.separator + imageName);
+//                if (!imageStore.exists()) {
+//
+//                    File dir = new File("images");
+//                    if (!dir.exists() || !dir.isDirectory()) {
+//                        Files.createDirectory(Paths.get(dir.getAbsolutePath()));
+//                    }
+//                    Files.createFile(Paths.get(imageStore.getAbsolutePath()));
+//
+//                    String imageDump = response.header("imageDump");
+//                    if (imageDump != null && !imageDump.isEmpty()) {
+//                        byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
+//
+//                        try {
+//                            FileOutputStream fos = new FileOutputStream(imageStore);
+//                            fos.write(data);
+//                            fos.close();
+//
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
+//            }
+
+            return response.header("mediaInfo");
+
         } catch (IOException e) {
             return "";
         }
     }
-    
+
     private static boolean subscriptionAdd(String mediaId)
     {
         String url = BASE_URI + "addSubscription";
-        
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("mediaId", mediaId)
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId));
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("mediaId", mediaId)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             return printResponse(response);
-            
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static boolean subscriptionRemove(String mediaId)
     {
         String url = BASE_URI + "removeSubscription";
-        
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("mediaId", mediaId)
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId));
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return false;
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("mediaId", mediaId)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             return printResponse(response);
-            
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             return false;
         }
     }
-    
+
     private static String subscriptionsGet()
     {
         String url = BASE_URI + "getSubscriptions";
-        
+
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
-        
+
         try {
-            FormDataMultiPart formMultiPart = new FormDataMultiPart();
-            FormDataMultiPart multiPart = formMultiPart
-                    .field("authToken", encryptedAuthToken)
-                    .field("commId", String.valueOf(serverCommId));
-            
-            WebTarget target = client.target(url);
-            Response response;
-            try {
-                response = target.request().post(Entity.entity(multiPart, multiPart.getMediaType()));
-            } catch (ProcessingException ignored) {
-                return "";
-            }
-            
-            formMultiPart.close();
-            multiPart.close();
-            
+            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+            Response response = client.newCall(request).execute();
+
             if (!printResponse(response)) {
                 return "";
             }
-            
-            return response.getHeaderString("subscriptions");
-            
-        } catch (IOException e) {
+
+            return response.header("subscriptions");
+
+        } catch (Exception e) {
             return "";
         }
     }

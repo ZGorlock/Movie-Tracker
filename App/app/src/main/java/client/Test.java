@@ -21,7 +21,7 @@ public class Test
     public static void main(String[] args)
     {
         ServerHandler.setupServerHandler();
-    
+
     
         
         
@@ -52,23 +52,23 @@ public class Test
             return;
         }
         System.out.println("Producer data: " + user.toString());
-    
-    
+
+
         //authorize producer, get an auth token allowing them to make changes to the database, the auth token is required for some endpoints
-        
+
         String token = ServerHandler.authorizeUser(testProducer, testPass);
         System.out.println("Producer authorized with auth token: " + token);
-        
-        
-        
-        
+
+
+
+
         //add media
-        
+
         //title, type, and genre <= 64 characters
         //rating <= 16 characters
         //actors, showtimes <= 1024 characters
         //description <= 2048 characters
-        
+
         Media media1 = new Media();
         media1.setTitle("The Show");
         media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
@@ -101,52 +101,52 @@ public class Test
         media1.setShowtimes("Dec 3, 2017 01:00 PM;");
 
         ServerHandler.addMedia(media1);
-        
-        
+
+
         //query the current media by this producer
-        
+
         Media queryMedia = new Media();
         queryMedia.setProducerId(ServerHandler.userId); //anything set in this query Media will be used as a parameter in the search. producerId and year require exact matches, everything else will perform a "string contains" operation. Any parameter with a ';' will be discarded as safety against sql injection. This means you cannot search multiple actors or showtimes at once.
         List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
         for (int i : currentMedia) {
             System.out.println("Query returned Media: " + i);
         }
-        
-        
+
+
         //retrieve a media
-        
+
         Media retrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(0)); //retrieve the first media in the list, this will return a usable Media entity. This will also download the media's image to the images/ folder, but only the first time. You can get the image from the image field in the entity.
         System.out.println(retrievedMedia.toString());
-        
-        
+
+
         //edit media
-        
+
         retrievedMedia.setTitle(retrievedMedia.getTitle() + " edited");
         ServerHandler.editMedia(retrievedMedia.getMediaId(), retrievedMedia);
-    
-        
+
+
         //retrieve the edited media
-    
+
         Media newRetrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(0)); //retrieve the media again
         System.out.println(newRetrievedMedia.toString());
-        
-        
+
+
         //delete media
-        
+
         ServerHandler.deleteMedia(newRetrievedMedia.getMediaId());
-    
-    
+
+
         //query the current media by this producer after deleting one
-    
+
         queryMedia.setProducerId(ServerHandler.userId);
         currentMedia = ServerHandler.queryMedia(queryMedia);
         for (int i : currentMedia) {
             System.out.println("Query returned Media: " + i);
         }
-        
-        
-        
-        
+
+
+
+
         //register a user on the server
         registered = ServerHandler.registerUser(testUser, testPass, "email@email.com", "Sandersmith", "Anderstein", false);
         if (registered) {
@@ -155,45 +155,45 @@ public class Test
             System.out.println("User: " + testUser + " could not be registered");
             return;
         }
-        
-        
+
+
         //essentially logging in, making sure the credentials are good and returning a User object
         user = ServerHandler.validateUser(testUser, testPass);
         if (user == null) {
             return;
         }
         System.out.println("User data: " + user.toString());
-    
-    
+
+
         //authorize user, get an auth token allowing them to add, remove, and get their subscriptions, the auth token is required for some endpoints
-    
+
         token = ServerHandler.authorizeUser(testUser, testPass);
         System.out.println("User authorized with auth token: " + token);
-        
-        
-        
-        
+
+
+
+
         //add subscriptions
-    
+
         ServerHandler.addSubscription(currentMedia.get(0));
         ServerHandler.addSubscription(currentMedia.get(1));
-        
-        
+
+
         //get User's subscriptions
-        
+
         List<Integer> subscriptions = ServerHandler.getSubscriptions();
         for (int i : subscriptions) {
             System.out.println("Subscribed to Media: " + i);
         }
-        
-        
+
+
         //remove subscription
-    
+
         ServerHandler.removeSubscription(currentMedia.get(0)); //in the event that a Media is deleted while a User is subscribed to it, during the process of deleting the Media the server will also remove any subscriptions for that Media for all Users
-    
-    
+
+
         //get User's subscriptions after removing one
-    
+
         subscriptions = ServerHandler.getSubscriptions();
         for (int i : subscriptions) {
             System.out.println("Subscribed to Media: " + i);
