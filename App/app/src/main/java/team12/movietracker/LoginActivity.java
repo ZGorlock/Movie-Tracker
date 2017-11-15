@@ -33,6 +33,10 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import client.Test;
+import client.server.ServerHandler;
+
+
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 //import client.*;
@@ -147,6 +151,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
 //            }
 //        }
 //    }
+
 
 
     /**
@@ -329,6 +334,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
             try {
                 // Simulate network access.
                 Thread.sleep(2000);
+                Test.main(new String[] {}); //TODO remove this later
             } catch (InterruptedException e) {
                 return false;
             }
