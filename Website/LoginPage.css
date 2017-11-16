@@ -1,0 +1,95 @@
+/* The Modal (background) */
+body, html{
+  background-color: #808B96;
+}
+
+h1, html{
+  text-align: center;
+  font-size: 32pt;
+  font-weight: bold;
+  padding: 10px;
+}
+
+h2, html{
+  padding-bottom: 10px;
+  font-size: 22pt;
+  font-weight: normal;
+  text-align: center;
+}
+
+h3, html{
+  text-align: center;
+  font-size: 14pt;
+  font-weight: normal;
+}
+
+h4, html{
+  text-align: center;
+  font-size: 14pt;
+  font-weight: normal;
+}
+
+label{
+display:inline-block;
+width:150px;
+margin-right:0px;
+text-align: top;
+padding-bottom: 5px;
+}
+
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(52, 73, 94); /* Fallback color */
+    background-color: rgba(52, 73, 94,0.4); /* Black w/ opacity */
+    padding-top: 20px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: #A3E4D7;
+    margin: 200px auto; /* 15% from the top and centered */
+    border: 1px solid #888;
+    width: 18%; /* Could be more or less, depending on screen size */
+    padding: 20px;
+}
+
+/* The Close Button */
+.close {
+    /* Position it in the top right corner outside of the modal */
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: #000;
+    font-size: 35px;
+    font-weight: bold;
+}
+
+/* Close button on hover */
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Add Zoom Animation */
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0)}
+    to {-webkit-transform: scale(1)}
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0)}
+    to {transform: scale(1)}
+}
