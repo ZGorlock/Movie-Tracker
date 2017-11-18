@@ -11,6 +11,7 @@
     tools:context="team12.movietracker.RegisterActivity"
     tools:showIn="@layout/activity_register">
 
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
@@ -26,6 +27,8 @@
         android:id="@+id/register_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+
 
         <TextView
             android:id="@+id/textViewPasswordConfirm"
@@ -54,7 +57,7 @@
             android:layout_marginTop="32dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="First"
+            android:hint="First"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -115,7 +118,7 @@
             android:layout_marginTop="16dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Last"
+            android:hint="Last"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextFirstName" />
 
@@ -127,7 +130,7 @@
             android:layout_marginTop="16dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Username"
+            android:hint="Username"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextLastName" />
 
@@ -159,7 +162,7 @@
             android:layout_marginTop="16dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Email"
+            android:hint="Email"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editTextUsername" />
     </android.support.constraint.ConstraintLayout>

@@ -21,14 +21,14 @@ import android.widget.EditText;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText mFirstName = (EditText) findViewById(R.id.editTextFirstName);
-    private EditText mLastName = (EditText) findViewById(R.id.editTextLastName);
-    private EditText mUserName = (EditText) findViewById(R.id.editTextUsername);
-    private EditText mPassword = (EditText) findViewById(R.id.editTextPassword);
-    private EditText mPasswordConfirm = (EditText) findViewById(R.id.editTextPasswordConfirm);
-    private EditText mEmail = (EditText) findViewById(R.id.editTextEmail);
-    private View mProgressView = findViewById(R.id.register_form);
-    private View mRegisterFormView = findViewById(R.id.progressBar);
+    private EditText mFirstName;
+    private EditText mLastName;
+    private EditText mUserName;
+    private EditText mPassword;
+    private EditText mPasswordConfirm;
+    private EditText mEmail;
+    private View mProgressView;
+    private View mRegisterFormView;
     private UserRegisterTask mAuthTask = null;
 
 
@@ -40,7 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Button registerButton = (Button) findViewById(R.id.register_button);
+        Button registerButton = (Button) findViewById(R.id.buttonRegister);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -48,8 +48,14 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-
-
+        mFirstName = (EditText) findViewById(R.id.editTextFirstName);
+        mLastName = (EditText) findViewById(R.id.editTextLastName);
+        mUserName = (EditText) findViewById(R.id.editTextUsername);
+        mPassword = (EditText) findViewById(R.id.editTextPassword);
+        mPasswordConfirm = (EditText) findViewById(R.id.editTextPasswordConfirm);
+        mEmail = (EditText) findViewById(R.id.editTextEmail);
+        mProgressView = findViewById(R.id.register_form);
+        mRegisterFormView = findViewById(R.id.progressBar);
     }
 
     private void attemptRegister()

@@ -198,4 +198,9 @@
     <string name="title_activity_show_detail">ShowDetailActivity</string>
     <string name="textviewTitle">TextViewTitle</string>
     <string name="textviewDescription">TextViewDescription</string>
+
+    <!--- Facebook log in -->
+    <string name="facebook_app_id">319008341913334</string>
+    <string name="fb_login_protocol_scheme">fb319008341913334</string>
+
 </resources>
