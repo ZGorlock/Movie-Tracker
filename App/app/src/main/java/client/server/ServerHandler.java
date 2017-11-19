@@ -154,25 +154,19 @@ public class ServerHandler extends Application
     
     public static boolean registerUser(String username, String password, String email, String firstName, String lastName, boolean producer)
     {
-        Log.d("ServerHandler:", "Just Called");
         String passHash = CryptoUtility.hashSHA512(password);
-        Log.d("ServerHandler:", "Hashed");
 
         String signature = ClientCommunicationHandler.signCommunication(serverCommId, passHash);
-        Log.d("ServerHandler:", "Signed");
 
         String encryptedPassHash = ClientCommunicationHandler.encryptCommunication(serverCommId, passHash);
-        Log.d("ServerHandler:", "Encrypt");
 
         if (encryptedPassHash.isEmpty()) {
-            Log.d("ServerHandler:", "Just Called");
 
             return false;
         }
 
 
         userId = registerUser(username, encryptedPassHash, signature, serverCommId, email, firstName, lastName, producer);
-        Log.d("ServerHandler:", "Just Called");
 
         return userId != -1;
     }

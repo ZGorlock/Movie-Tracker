@@ -15,6 +15,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
+import client.pojo.User;
+import client.server.ServerHandler;
 //import client.*;
 //import client.server.ServerHandler;
 
@@ -77,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         View focusView = null;
         boolean cancel = false;
-
+        //Todo: Add valid checks besides just empty
         //Check firstName
         if ((TextUtils.isEmpty(firstName)))
         {
@@ -170,6 +173,8 @@ public class RegisterActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
+            mAuthTask = new UserRegisterTask(username, password, email, firstName, lastName);
+            mAuthTask.execute((Void) null);
             showProgress(true);
 
         }
@@ -254,15 +259,19 @@ public class RegisterActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
 
-            //ServerHandler.registerUser(mUsername, mPassword, mEmail, mFirstName, mLastName, false);
+            ServerHandler.setupServerHandler();
+
+            boolean registered = ServerHandler.registerUser(mUsername, mPassword, mEmail, mFirstName, mLastName, false);
+            if (registered) {
+                return true;
+            } else {
+                return false;
+            }
 
 
 
-            // TODO: register the new account here.
-            return true;
         }
 
         @Override
@@ -271,12 +280,13 @@ public class RegisterActivity extends AppCompatActivity {
 
 
             if (success) {
+//                ServerHandler.shutdownServerHandler();
                 Intent displayLogin = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(displayLogin);
                 showProgress(false);
             } else {
                 showProgress(false);
-                mUserName.setError(getString(R.string.error_inuse_username));
+                mUserName.setError(getString(R.string.error_taken_username));
                 mUserName.requestFocus();
             }
         }

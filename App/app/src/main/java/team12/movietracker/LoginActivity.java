@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import client.Test;
+import client.pojo.User;
 import client.server.ServerHandler;
 
 
@@ -329,26 +331,29 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-                Test.main(new String[] {}); //TODO remove this later
-            } catch (InterruptedException e) {
+                ServerHandler.setupServerHandler();
+
+                User user = ServerHandler.validateUser(mUsername, mPassword);
+                if (user == null) {
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            } catch (Exception e) {
                 return false;
             }
 
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mUsername)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
+//            for (String credential : DUMMY_CREDENTIALS) {
+//                String[] pieces = credential.split(":");
+//                if (pieces[0].equals(mUsername)) {
+//                    // Account exists, return true if the password matches.
+//                    return pieces[1].equals(mPassword);
+//                }
+//            }
 
-            // TODO: register the new account here.
-            return true;
         }
 
         @Override
