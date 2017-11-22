@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <android.support.widget.CardView
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
@@ -43,8 +43,39 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/textviewDescription" />
+
+                <TextView
+                    android:id="@+id/textViewActors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextViewActors" />
+
+                <TextView
+                    android:id="@+id/textViewGenre"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextViewGenre" />
+
+                <TextView
+                    android:id="@+id/textViewShowTimes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextViewShowTimes" />
+
+                <TextView
+                    android:id="@+id/textViewRating"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextViewRating" />
+
+                <TextView
+                    android:id="@+id/textViewYear"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="TextViewYear" />
             </LinearLayout>
-        </android.support.widget.CardView>
+        </android.support.v7.widget.CardView>
+
     </ScrollView>
 
     <TextView

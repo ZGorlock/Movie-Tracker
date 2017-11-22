@@ -10,7 +10,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TextView;
 
+import client.pojo.User;
+import client.server.ServerHandler;
+
 public class SearchResultsActivity extends HomeActivity {
+
+    private String mUsername;
+    private String mPassword;
+
 
     private TextView mSearchResults;
     @Override
@@ -20,6 +27,9 @@ public class SearchResultsActivity extends HomeActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mUsername = getIntent().getStringExtra("USER");
+        mPassword = getIntent().getStringExtra("PASS");
+        User user = ServerHandler.validateUser(mUsername, mPassword);
         mSearchResults = (TextView) findViewById(R.id.searchResults);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String queryResult = sharedPreferences.getString(SEARCH_QUERY, "");

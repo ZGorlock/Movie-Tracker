@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import client.pojo.User;
+import client.server.ServerHandler;
+
 public class SuggestionsActivity extends AppCompatActivity {
 
     /**
@@ -35,6 +38,10 @@ public class SuggestionsActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    private String mUsername;
+    private String mPassword;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,6 +50,9 @@ public class SuggestionsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mUsername = getIntent().getStringExtra("USER");
+        mPassword = getIntent().getStringExtra("PASS");
+        User user = ServerHandler.validateUser(mUsername, mPassword);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

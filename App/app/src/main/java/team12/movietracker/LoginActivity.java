@@ -71,6 +71,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
     private View mProgressView;
     private View mLoginFormView;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -324,6 +325,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
         private final String mUsername;
         private final String mPassword;
 
+
         UserLoginTask(String username, String password) {
             mUsername = username;
             mPassword = password;
@@ -363,6 +365,8 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
 
             if (success) {
                 Intent displayHome = new Intent(LoginActivity.this, HomeActivity.class);
+                displayHome.putExtra("USER",mUsername);
+                displayHome.putExtra("PASS",mPassword);
                 startActivity(displayHome);
                 showProgress(false);
             } else {
