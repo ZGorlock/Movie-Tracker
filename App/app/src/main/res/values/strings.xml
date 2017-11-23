@@ -202,5 +202,7 @@
     <!--- Facebook log in -->
     <string name="facebook_app_id">319008341913334</string>
     <string name="fb_login_protocol_scheme">fb319008341913334</string>
+    <string name="favorite_add">Add</string>
+    <string name="favorite_remove">Remove</string>
 
 </resources>

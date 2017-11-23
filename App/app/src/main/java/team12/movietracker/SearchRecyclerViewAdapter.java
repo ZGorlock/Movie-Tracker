@@ -1,29 +1,30 @@
 package team12.movietracker;
 
-import android.content.Context;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import java.util.List;
+    import android.content.Context;
+    import android.support.v7.widget.RecyclerView;
+    import android.view.LayoutInflater;
+    import android.view.View;
+    import android.view.ViewGroup;
+    import android.widget.ImageView;
+    import android.widget.TextView;
 
-import client.pojo.Media;
-import client.server.ServerHandler;
+    import java.util.List;
+
+    import client.pojo.Media;
+    import client.server.ServerHandler;
 
 /**
  * Created by estor on 11/22/2017.
  */
 
-class DetailRecyclerViewAdapter extends RecyclerView.Adapter<DetailRecyclerViewAdapter.MovieImageViewHolder> {
+class SearchRecyclerViewAdapter extends RecyclerView.Adapter<SearchRecyclerViewAdapter.MovieImageViewHolder> {
 
 
     private List<Integer> mSubscriptions;
     private Context mContext;
 
-    public DetailRecyclerViewAdapter(Context context, List<Integer> subscriptionsList) {
+    public SearchRecyclerViewAdapter(Context context, List<Integer> subscriptionsList) {
         mContext = context;
         mSubscriptions = subscriptionsList;
 
@@ -38,13 +39,12 @@ class DetailRecyclerViewAdapter extends RecyclerView.Adapter<DetailRecyclerViewA
 
     @Override
     public void onBindViewHolder(MovieImageViewHolder holder, int position) {
-        Integer subItem = mSubscriptions.get(position);
-        //Picasso.with(mContext).load(subItem.getImage(subItem));
-        System.out.println("Adapter "+subItem);
-        Media queryMedia = new Media();
-        queryMedia.setMediaId(subItem);
-        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
-        Media retrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(position));
+//        Integer subItem = mSubscriptions.get(position);
+//        //Picasso.with(mContext).load(subItem.getImage(subItem));
+//        Media queryMedia = new Media();
+//        queryMedia.setMediaId(subItem);
+//        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
+        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position));
         holder.title.setText(retrievedMedia.getTitle());
         holder.showTime.setText(retrievedMedia.getShowtimes());
 
@@ -82,3 +82,4 @@ class DetailRecyclerViewAdapter extends RecyclerView.Adapter<DetailRecyclerViewA
         }
     }
 }
+

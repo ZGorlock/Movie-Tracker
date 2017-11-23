@@ -367,6 +367,8 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
                 Intent displayHome = new Intent(LoginActivity.this, HomeActivity.class);
                 displayHome.putExtra("USER",mUsername);
                 displayHome.putExtra("PASS",mPassword);
+                mUsernameView.clearFocus();
+                mPasswordView.clearFocus();
                 startActivity(displayHome);
                 showProgress(false);
             } else {

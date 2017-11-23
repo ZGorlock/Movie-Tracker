@@ -118,13 +118,38 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(HomeActivity.this, "Normal tap at position "+ position, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, ShowDetailActivity.class);
+        intent.putExtra("USER",mUsername);
+        intent.putExtra("PASS",mPassword);
+        intent.putExtra("MEDIAID",mDetailRecyclerViewAdapter.getSub(position));
+        startActivity(intent);
     }
 
     @Override
     public void onItemLongClick(View view, int position) {
-        Toast.makeText(HomeActivity.this, "Long tap at position "+ position, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, ShowDetailActivity.class);
+        intent.putExtra("USER",mUsername);
+        intent.putExtra("PASS",mPassword);
+        intent.putExtra("MEDIAID",mDetailRecyclerViewAdapter.getSub(position));
+        startActivity(intent);
 
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ServerHandler.setupServerHandler();
+        String token = ServerHandler.authorizeUser(mUsername, mPassword);
+        List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
+
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
+        recyclerView.setAdapter(mDetailRecyclerViewAdapter);
+        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
+
+        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
     }
 
     @Override
@@ -140,22 +165,18 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 //        mdHBTask.execute(); MAYBE TRY TO GET THIS TO ANOTHER THREAD THAN MAIN
-        ServerHandler.setupServerHandler();
-//        User user = ServerHandler.validateUser(mUsername, mPassword);
-        String token = ServerHandler.authorizeUser(mUsername, mPassword);
-//        ServerHandler.addSubscription(2137211017);
-        List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
-
-        System.out.println(subscriptions1.get(0));
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
-        recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
-
-        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
+//        ServerHandler.setupServerHandler();
+//        String token = ServerHandler.authorizeUser(mUsername, mPassword);
+//        List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
+//
+//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//
+//        mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
+//        recyclerView.setAdapter(mDetailRecyclerViewAdapter);
+//        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
+//
+//        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
 
 
