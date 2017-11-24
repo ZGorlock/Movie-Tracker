@@ -39,6 +39,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
     private String mPassword;
     private DetailRecyclerViewAdapter mDetailRecyclerViewAdapter;
     private displayHomeBrowse mdHBTask = null;
+    private boolean firstCreate = true;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -139,6 +140,21 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
     protected void onResume() {
         super.onResume();
         ServerHandler.setupServerHandler();
+        if(firstCreate)
+        {
+            mUsername = getIntent().getStringExtra("USER");
+            System.out.println(mUsername);
+            mPassword = getIntent().getStringExtra("PASS");
+            System.out.println(mPassword);
+        }
+        else
+        {
+            System.out.println(mUsername);
+            System.out.println(mPassword);
+        }
+
+
+
         String token = ServerHandler.authorizeUser(mUsername, mPassword);
         List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
 
@@ -164,6 +180,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        firstCreate = false;
 //        mdHBTask.execute(); MAYBE TRY TO GET THIS TO ANOTHER THREAD THAN MAIN
 //        ServerHandler.setupServerHandler();
 //        String token = ServerHandler.authorizeUser(mUsername, mPassword);
