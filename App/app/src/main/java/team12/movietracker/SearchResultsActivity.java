@@ -52,12 +52,25 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
         super.onResume();
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String queryResult = sharedPreferences.getString(SEARCH_QUERY, "");
+        List<Integer> currentMedia = new ArrayList<Integer>();
         Media queryMedia = new Media();
         queryMedia.setTitle(queryResult); //anything set in this query Media will be used as a parameter in the search. producerId and year require exact matches, everything else will perform a "string contains" operation. Any parameter with a ';' will be discarded as safety against sql injection. This means you cannot search multiple actors or showtimes at once.
-        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
-        queryMedia.setActors(queryResult);
-        List<Integer> currentMediaDirector = ServerHandler.queryMedia(queryMedia);
+        List<Integer> currentMediaTitle = ServerHandler.queryMedia(queryMedia);
+//        for (int i : currentMediaTitle) {
+//            System.out.println("Query returned Media: Title" + i);
+//        }
+        Media queryMediaActor = new Media();
+        queryMediaActor.setActors(queryResult);
+        List<Integer> currentMediaDirector = ServerHandler.queryMedia(queryMediaActor);
+//        for (int k : currentMediaDirector) {
+//            System.out.println("Query returned Media: Actor" + k);
+//        }
+        currentMedia.addAll(currentMediaTitle);
         currentMedia.addAll(currentMediaDirector);
+
+//        for (int j : currentMedia) {
+//            System.out.println("Query returned Media: Combined" + j);
+//        }
 
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);

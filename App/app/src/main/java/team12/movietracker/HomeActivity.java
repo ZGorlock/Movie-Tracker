@@ -59,12 +59,12 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
                     displaySuggestions.putExtra("PASS",mPassword);
                     startActivity(displaySuggestions);
                     return true;
-                case R.id.navigation_favorites:
-                    Intent displayFavorites = new Intent(HomeActivity.this, FavoritesActivity.class);
-                    displayFavorites.putExtra("USER",mUsername);
-                    displayFavorites.putExtra("PASS",mPassword);
-                    startActivity(displayFavorites);
-                    return true;
+//                case R.id.navigation_favorites:
+//                    Intent displayFavorites = new Intent(HomeActivity.this, FavoritesActivity.class);
+//                    displayFavorites.putExtra("USER",mUsername);
+//                    displayFavorites.putExtra("PASS",mPassword);
+//                    startActivity(displayFavorites);
+//                    return true;
             }
             return false;
         }
