@@ -6,9 +6,19 @@
 
 package client.server;
 
-import java.io.ByteArrayOutputStream;
+import android.app.Application;
+
+import com.squareup.okhttp.MultipartBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.SecretKey;
@@ -28,67 +37,69 @@ import client.pojo.Media;
 import client.pojo.User;
 import client.utility.CryptoUtility;
 
-public class ServerHandler
+//import com.sun.jna.platform.FileUtils;
+
+public class ServerHandler extends Application
 {
-
+    
     //Constants
-
+    
     /**
      * The base uri for the server.
      */
     public static final String BASE_URI = "http://movie-tracker.dynu.net:4444/";
-
+    
     /**
      * The size in bytes of the buffer used for file transfers.
      */
     public static final int BUFFER_SIZE = 16384;
-
+    
     /**
      * The regex pattern for a Content-Disposition header.
      */
     public static final Pattern CONTENT_DISPOSITION_PATTERN = Pattern.compile("attachment; filename=(?<filename>.*); size=(?<filesize>.*);");
-
-
+    
+    
     //Static Fields
-
+    
     /**
      * The resource configuration for the Client connection to the server.
      */
     //private static final ResourceConfig resourceConfig = new ResourceConfig();
-
+    
     /**
      * The client connection to the server.
      */
     private static OkHttpClient client = null;
-
+    
     /**
      * The DSA keys of the system.
      */
     private static KeyPair dsaKeys = null;
-
+    
     /**
      * The RSA keys of the system.
      */
     private static KeyPair rsaKeys = null;
-
+    
     /**
      * The auth token distributed by the server.
      */
     public static String authToken = "";
-
+    
     /**
      * The id of the communication channel opened for communicating with the server.
      */
     public static long serverCommId = -1L;
-
+    
     /**
      * The id of the user logged in.
      */
     public static int userId = -1;
-
-
+    
+    
     //Methods
-
+    
     /**
      * Sets up the Server handler.
      */
@@ -96,12 +107,12 @@ public class ServerHandler
     {
         //set up the client connection
         client = new OkHttpClient();
-
+    
         //generate the unique keys for the client
         generateKeys();
         openCommunicationChannel();
     }
-
+    
     /**
      * Generates the unique keys for the client.
      */
@@ -112,7 +123,7 @@ public class ServerHandler
         SecurityHandler.setDsaKeys(dsaKeys);
         SecurityHandler.setRsaKeys(rsaKeys);
     }
-
+    
     /**
      * Shuts down the Server handler.
      */
@@ -121,7 +132,7 @@ public class ServerHandler
         //close the client connection
         closeCommunicationChannel(serverCommId);
     }
-
+    
     /**
      * Prints the response from the DLA server.
      *
@@ -134,10 +145,10 @@ public class ServerHandler
         System.out.println("Server: Returned response: " + response.code() + " - " + ((message == null) ? "  Server: Encountered an exception" : message));
         return response.code() == 200;
     }
-
-
+    
+    
     //REST Endpoint Access
-
+    
     public static boolean registerUser(String username, String password, String email, String firstName, String lastName, boolean producer)
     {
         String passHash = CryptoUtility.hashSHA512(password);
@@ -350,10 +361,10 @@ public class ServerHandler
         }
         return new ArrayList<>();
     }
-
-
+    
+    
     //REST Endpoints
-
+    
     /**
      * Opens a new communication channel with the server.
      *
@@ -822,5 +833,5 @@ public class ServerHandler
             return "";
         }
     }
-
+    
 }

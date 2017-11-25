@@ -6,16 +6,19 @@
 
 package client.server;
 
-import utility.CryptoUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.SecretKey;
-import java.security.*;
+import java.security.Key;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
+
+import client.utility.CryptoUtility;
 
 /**
  * Handled encrypted communication with clients.
@@ -111,12 +114,15 @@ public final class ClientCommunicationHandler
      */
     public static String encryptCommunication(long id, String message)
     {
+
         SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
         if (aesKey == null) {
+
             return "";
         }
-        
+
         return CryptoUtility.encryptAES(message, aesKey);
+//        return message;
     }
     
     /**

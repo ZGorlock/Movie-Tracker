@@ -9,7 +9,11 @@ package client.utility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.StringTokenizer;
 
 /**
  * A resource class with provides additional String functionality.
@@ -317,7 +321,7 @@ public final class StringUtility
      */
     public static String removePunctuationSoft(String string)
     {
-        return removePunctuationSoft(string, new ArrayList<>());
+        return removePunctuationSoft(string, new ArrayList<Character>());
     }
     
     /**
