@@ -41,10 +41,7 @@ class DetailRecyclerViewAdapter extends RecyclerView.Adapter<DetailRecyclerViewA
         Integer subItem = mSubscriptions.get(position);
         //Picasso.with(mContext).load(subItem.getImage(subItem));
         System.out.println("Adapter "+subItem);
-        Media queryMedia = new Media();
-        queryMedia.setMediaId(subItem);
-        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
-        Media retrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(position));
+        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position));
         holder.title.setText(retrievedMedia.getTitle());
         holder.showTime.setText(retrievedMedia.getShowtimes());
 

@@ -142,7 +142,7 @@ public class Test
 
         Media media1 = new Media();
 
-        media1.setTitle("The Show");
+        media1.setTitle("DuringDayNoneTest");
 
         media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
 
@@ -156,7 +156,7 @@ public class Test
 
         media1.setImage(new File("resources/unnamed.png"));
 
-        media1.setShowtimes("Nov 17, 2017 11:00 PM; Nov 19, 217 08:00 PM;"); //same with the format and delimination of these
+        media1.setShowtimes("Nov 25, 2017 1:00 PM;"); //same with the format and delimination of these
 
         media1.setRating("R");
 
@@ -168,41 +168,41 @@ public class Test
 
 
 
-        media1.setTitle("The other Show");
-
-        media1.setDescription("This is the other TV Show.");
-
-        media1.setShowtimes("Dec 1, 2017 01:00 PM;");
-
-
-
-        ServerHandler.addMedia(media1);
-
-
-
-        media1.setTitle("The Movie");
-
-        media1.setType("Movie");
-
-        media1.setDescription("This is the movie.");
-
-        media1.setShowtimes("Dec 7, 2017 01:00 PM;");
-
-
-
-        ServerHandler.addMedia(media1);
-
-
-
-        media1.setTitle("The other Movie");
-
-        media1.setDescription("This is the other Movie.");
-
-        media1.setShowtimes("Dec 3, 2017 01:00 PM;");
-
-
-
-        ServerHandler.addMedia(media1);
+//        media1.setTitle("The Super Show");
+//
+//        media1.setDescription("This is the other TV Show.");
+//
+//        media1.setShowtimes("Nov 25, 2017 3:30 AM;Nov 25, 2017 3:35 AM;");
+//
+//
+//
+//        ServerHandler.addMedia(media1);
+//
+//
+//
+//        media1.setTitle("The Movie");
+//
+//        media1.setType("Movie");
+//
+//        media1.setDescription("This is the movie.");
+//
+//        media1.setShowtimes("Dec 7, 2017 01:00 PM;");
+//
+//
+//
+//        ServerHandler.addMedia(media1);
+//
+//
+//
+//        media1.setTitle("The other Movie");
+//
+//        media1.setDescription("This is the other Movie.");
+//
+//        media1.setShowtimes("Dec 3, 2017 01:00 PM;");
+//
+//
+//
+//        ServerHandler.addMedia(media1);
 
 
 
@@ -244,49 +244,49 @@ public class Test
 
 
 
-        retrievedMedia.setTitle(retrievedMedia.getTitle() + " edited");
-
-        ServerHandler.editMedia(retrievedMedia.getMediaId(), retrievedMedia);
-
-
-
-
-
-        //retrieve the edited media
-
-
-
-        Media newRetrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(0)); //retrieve the media again
-
-        System.out.println(newRetrievedMedia.toString());
-
-
-
-
-
-        //delete media
-
-
-
-        ServerHandler.deleteMedia(newRetrievedMedia.getMediaId());
-
-
-
-
-
-        //query the current media by this producer after deleting one
-
-
-
-        queryMedia.setProducerId(ServerHandler.userId);
-
-        currentMedia = ServerHandler.queryMedia(queryMedia);
-
-        for (int i : currentMedia) {
-
-            System.out.println("Query returned Media: " + i);
-
-        }
+//        retrievedMedia.setTitle(retrievedMedia.getTitle() + " edited");
+//
+//        ServerHandler.editMedia(retrievedMedia.getMediaId(), retrievedMedia);
+//
+//
+//
+//
+//
+//        //retrieve the edited media
+//
+//
+//
+//        Media newRetrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(0)); //retrieve the media again
+//
+//        System.out.println(newRetrievedMedia.toString());
+//
+//
+//
+//
+//
+//        //delete media
+//
+//
+//
+//        ServerHandler.deleteMedia(newRetrievedMedia.getMediaId());
+//
+//
+//
+//
+//
+//        //query the current media by this producer after deleting one
+//
+//
+//
+//        queryMedia.setProducerId(ServerHandler.userId);
+//
+//        currentMedia = ServerHandler.queryMedia(queryMedia);
+//
+//        for (int i : currentMedia) {
+//
+//            System.out.println("Query returned Media: " + i);
+//
+//        }
 
 
 
@@ -354,7 +354,7 @@ public class Test
 
         ServerHandler.addSubscription(currentMedia.get(0));
 
-        ServerHandler.addSubscription(currentMedia.get(1));
+//        ServerHandler.addSubscription(currentMedia.get(1));
 
 
 

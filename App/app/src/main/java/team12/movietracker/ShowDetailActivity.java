@@ -49,6 +49,8 @@ public class ShowDetailActivity extends AppCompatActivity {
         mPassword = getIntent().getStringExtra("PASS");
         mMediaID = getIntent().getIntExtra("MEDIAID",0);
         User user = ServerHandler.validateUser(mUsername, mPassword);
+        String token = ServerHandler.authorizeUser(mUsername, mPassword);
+
 
         mTitle = (TextView) findViewById(R.id.textViewTitle);
         mImage = (ImageView) findViewById(R.id.imageViewPoster);
@@ -61,10 +63,10 @@ public class ShowDetailActivity extends AppCompatActivity {
 
 
 //        ServerHandler.setupServerHandler();
-        Media retrivevedMedia = new Media();
-        retrivevedMedia = ServerHandler.retrieveMedia(mMediaID);
+        Media retrievedMedia = new Media();
+        retrievedMedia = ServerHandler.retrieveMedia(mMediaID);
         try{
-            mTitle.setText(retrivevedMedia.getTitle());
+            mTitle.setText(retrievedMedia.getTitle());
 
         }
         catch (Exception e)
@@ -81,7 +83,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 //        }
 
         try{
-            mDescription.setText(retrivevedMedia.getDescription());
+            mDescription.setText(retrievedMedia.getDescription());
 
         }
         catch (Exception e)
@@ -90,7 +92,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mActor.setText(retrivevedMedia.getActors());
+            mActor.setText(retrievedMedia.getActors());
 
         }
         catch (Exception e)
@@ -99,7 +101,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mGenre.setText(retrivevedMedia.getGenre());
+            mGenre.setText(retrievedMedia.getGenre());
 
         }
         catch (Exception e)
@@ -108,7 +110,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mShowTimes.setText(retrivevedMedia.getShowtimes());
+            mShowTimes.setText(retrievedMedia.getShowtimes());
 
         }
         catch (Exception e)
@@ -117,7 +119,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mRating.setText(retrivevedMedia.getRating());
+            mRating.setText(retrievedMedia.getRating());
 
         }
         catch (Exception e)
@@ -126,7 +128,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mYear.setText(retrivevedMedia.getYear());
+            mYear.setText(retrievedMedia.getYear());
 
         }
         catch (Exception e)

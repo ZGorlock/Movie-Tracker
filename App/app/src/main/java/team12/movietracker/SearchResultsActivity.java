@@ -39,6 +39,8 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
         mUsername = getIntent().getStringExtra("USER");
         mPassword = getIntent().getStringExtra("PASS");
         User user = ServerHandler.validateUser(mUsername, mPassword);
+        String token = ServerHandler.authorizeUser(mUsername, mPassword);
+
 //        mSearchResults = (TextView) findViewById(R.id.searchResults);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String queryResult = sharedPreferences.getString(SEARCH_QUERY, "");
@@ -94,11 +96,11 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
 
     @Override
     public void onItemLongClick(View view, int position) {
-        Intent intent = new Intent(this, ShowDetailActivity.class);
-        intent.putExtra("USER",mUsername);
-        intent.putExtra("PASS",mPassword);
-        intent.putExtra("MEDIAID",mSearchRecyclerViewAdapter.getSub(position));
-        startActivity(intent);
+//        Intent intent = new Intent(this, ShowDetailActivity.class);
+//        intent.putExtra("USER",mUsername);
+//        intent.putExtra("PASS",mPassword);
+//        intent.putExtra("MEDIAID",mSearchRecyclerViewAdapter.getSub(position));
+//        startActivity(intent);
 
     }
 }
