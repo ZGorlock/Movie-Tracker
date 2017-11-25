@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.sql.PreparedStatement;
+import java.util.Base64;
 import java.util.UUID;
 
 /**
@@ -67,13 +68,13 @@ public class AddMedia
     /**
      * Adds a media to the server.
      *
-     * @param file        The image file.
-     * @param fileDetail  Details about the image file.
      * @param title       The title of the Media.
      * @param type        The type of the Media.
      * @param description The description of the Media.
      * @param genre       The genre of the Media.
      * @param actors      The actors of the Media.
+     * @param imageDump   The image string dump of the Media.
+     * @param imageType   The type of the image file of the Media.
      * @param showtimes   The showtimes of the Media.
      * @param rating      The rating of the Media.
      * @param year        The year of the Media.
@@ -85,13 +86,13 @@ public class AddMedia
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
     public Response addMedia(
-            @FormDataParam("file") InputStream file,
-            @FormDataParam("file") FormDataContentDisposition fileDetail,
             @FormDataParam("title") String title,
             @FormDataParam("type") String type,
             @FormDataParam("description") String description,
             @FormDataParam("genre") String genre,
             @FormDataParam("actors") String actors,
+            @FormDataParam("imageDump") String imageDump,
+            @FormDataParam("imageType") String imageType,
             @FormDataParam("showtimes") String showtimes,
             @FormDataParam("rating") String rating,
             @FormDataParam("year") int year,
@@ -155,27 +156,20 @@ public class AddMedia
             //create the image
             
             String image = "";
-            if (file != null) {
-                image = UUID.randomUUID().toString() + fileDetail.getFileName().substring(fileDetail.getFileName().indexOf('.'));
+            if (!imageDump.isEmpty()) {
+                image = UUID.randomUUID().toString() + '.' + imageType;
                 File tmpDir = new File(Server.IMAGES_DIR + image);
                 Files.createFile(Paths.get(tmpDir.getAbsolutePath()));
     
                 //receive the file transfer
     
+                byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
+    
                 try {
                     FileOutputStream fos = new FileOutputStream(tmpDir);
-                    byte[] buffer = new byte[Server.BUFFER_SIZE];
-        
-                    while (true) {
-                        int read;
-                        if ((read = file.read(buffer, 0, buffer.length)) == -1) {
-                            fos.flush();
-                            fos.close();
-                            break;
-                        }
-            
-                        fos.write(buffer, 0, read);
-                    }
+                    fos.write(data);
+                    fos.close();
+                    
                 } catch (IOException e) {
                     logger.error("POST failed: Image could not be written");
                     logger.error(Server.stackTrace(e));

@@ -6,10 +6,10 @@
 
 package client.server;
 
-import utility.CryptoUtility;
-
 import java.security.KeyPair;
 import java.security.PublicKey;
+
+import client.utility.CryptoUtility;
 
 public class SecurityHandler
 {

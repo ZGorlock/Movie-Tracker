@@ -208,39 +208,41 @@ public final class CryptoUtility
     @SuppressWarnings("TryWithIdenticalCatches")
     public static String encrypt(String message, PublicKey publicKey, String algorithm, String blockMode, String padding, String encoding)
     {
-        try {
-            String cipherMode = algorithm;
-            if (!blockMode.isEmpty() && !padding.isEmpty()) {
-                cipherMode += '/' + blockMode + '/' + padding;
-            }
-            
-            Cipher cipher = Cipher.getInstance(cipherMode);
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            
-            byte[] data = message.getBytes(encoding);
-            if (algorithm.equals(RSA_ALGORITHM) && (data.length > 128)) {
-                logger.error("RSA cannot encrypt messages longer than 128 bytes");
-                return "";
-            }
-            
-            byte[] result = cipher.doFinal(data);
-            return Base64.getEncoder().encodeToString(result);
-            
-        } catch (UnsupportedEncodingException ignored) {
-            logger.error("The encoding: {} is not supported", encoding);
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (IllegalBlockSizeException ignored) {
-            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
-        } catch (NoSuchPaddingException ignored) {
-            logger.error("The padding method: {} does not exist", padding);
-        } catch (BadPaddingException ignored) {
-            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
-        } catch (InvalidKeyException ignored) {
-            logger.error("The public key provided is invalid");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return "";
+        return message;
+        
+//        try {
+//            String cipherMode = algorithm;
+//            if (!blockMode.isEmpty() && !padding.isEmpty()) {
+//                cipherMode += '/' + blockMode + '/' + padding;
+//            }
+//
+//            Cipher cipher = Cipher.getInstance(cipherMode);
+//            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+//
+//            byte[] data = message.getBytes(encoding);
+//            if (algorithm.equals(RSA_ALGORITHM) && (data.length > 128)) {
+//                logger.error("RSA cannot encrypt messages longer than 128 bytes");
+//                return "";
+//            }
+//
+//            byte[] result = cipher.doFinal(data);
+//            return Base64.getEncoder().encodeToString(result);
+//
+//        } catch (UnsupportedEncodingException ignored) {
+//            logger.error("The encoding: {} is not supported", encoding);
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (IllegalBlockSizeException ignored) {
+//            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
+//        } catch (NoSuchPaddingException ignored) {
+//            logger.error("The padding method: {} does not exist", padding);
+//        } catch (BadPaddingException ignored) {
+//            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The public key provided is invalid");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return "";
     }
     
     /**
@@ -268,38 +270,39 @@ public final class CryptoUtility
     @SuppressWarnings("TryWithIdenticalCatches")
     public static String encryptAES(String message, SecretKey secret, String blockMode, String padding, String encoding)
     {
-        String algorithm = AES_ALGORITHM;
-        
-        try {
-            String cipherMode = algorithm;
-            if (!blockMode.isEmpty() && !padding.isEmpty()) {
-                cipherMode += '/' + blockMode + '/' + padding;
-            }
-            
-            Cipher cipher = Cipher.getInstance(cipherMode);
-            IvParameterSpec iv = new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-            cipher.init(Cipher.ENCRYPT_MODE, secret, iv);
-            
-            byte[] data = message.getBytes(encoding);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(data));
-            
-        } catch (UnsupportedEncodingException ignored) {
-            logger.error("The encoding: {} is not supported", encoding);
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (IllegalBlockSizeException ignored) {
-            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
-        } catch (NoSuchPaddingException ignored) {
-            logger.error("The padding method: {} does not exist", padding);
-        } catch (BadPaddingException ignored) {
-            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
-        } catch (InvalidAlgorithmParameterException ignored) {
-            logger.error("The IV parameter specification is invalid");
-        } catch (InvalidKeyException ignored) {
-            logger.error("The shared secret provided is invalid");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return "";
+        return message;
+//        String algorithm = AES_ALGORITHM;
+//
+//        try {
+//            String cipherMode = algorithm;
+//            if (!blockMode.isEmpty() && !padding.isEmpty()) {
+//                cipherMode += '/' + blockMode + '/' + padding;
+//            }
+//
+//            Cipher cipher = Cipher.getInstance(cipherMode);
+//            IvParameterSpec iv = new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+//            cipher.init(Cipher.ENCRYPT_MODE, secret, iv);
+//
+//            byte[] data = message.getBytes(encoding);
+//            return Base64.getEncoder().encodeToString(cipher.doFinal(data));
+//
+//        } catch (UnsupportedEncodingException ignored) {
+//            logger.error("The encoding: {} is not supported", encoding);
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (IllegalBlockSizeException ignored) {
+//            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
+//        } catch (NoSuchPaddingException ignored) {
+//            logger.error("The padding method: {} does not exist", padding);
+//        } catch (BadPaddingException ignored) {
+//            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
+//        } catch (InvalidAlgorithmParameterException ignored) {
+//            logger.error("The IV parameter specification is invalid");
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The shared secret provided is invalid");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return "";
     }
     
     /**
@@ -341,36 +344,38 @@ public final class CryptoUtility
     @SuppressWarnings("TryWithIdenticalCatches")
     public static String decrypt(String message, PrivateKey privateKey, String algorithm, String blockMode, String padding)
     {
-        try {
-            String cipherMode = algorithm;
-            if (!blockMode.isEmpty() && !padding.isEmpty()) {
-                cipherMode += '/' + blockMode + '/' + padding;
-            }
-            
-            Cipher cipher = Cipher.getInstance(cipherMode);
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            
-            byte[] data = Base64.getDecoder().decode(message);
-            if (algorithm.equals(RSA_ALGORITHM) && (data.length > 128)) {
-                logger.error("RSA cannot decrypt data longer than 128 bytes");
-                return "";
-            }
-            
-            return new String(cipher.doFinal(data));
-            
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (IllegalBlockSizeException ignored) {
-            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
-        } catch (NoSuchPaddingException ignored) {
-            logger.error("The padding method: {} does not exist", padding);
-        } catch (BadPaddingException ignored) {
-            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
-        } catch (InvalidKeyException ignored) {
-            logger.error("The public key provided is invalid");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return "";
+        return message;
+        
+//        try {
+//            String cipherMode = algorithm;
+//            if (!blockMode.isEmpty() && !padding.isEmpty()) {
+//                cipherMode += '/' + blockMode + '/' + padding;
+//            }
+//
+//            Cipher cipher = Cipher.getInstance(cipherMode);
+//            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+//
+//            byte[] data = Base64.getDecoder().decode(message);
+//            if (algorithm.equals(RSA_ALGORITHM) && (data.length > 128)) {
+//                logger.error("RSA cannot decrypt data longer than 128 bytes");
+//                return "";
+//            }
+//
+//            return new String(cipher.doFinal(data));
+//
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (IllegalBlockSizeException ignored) {
+//            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
+//        } catch (NoSuchPaddingException ignored) {
+//            logger.error("The padding method: {} does not exist", padding);
+//        } catch (BadPaddingException ignored) {
+//            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The public key provided is invalid");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return "";
     }
     
     /**
@@ -397,36 +402,37 @@ public final class CryptoUtility
     @SuppressWarnings("TryWithIdenticalCatches")
     public static String decryptAES(String message, SecretKey secret, String blockMode, String padding)
     {
-        String algorithm = AES_ALGORITHM;
-        
-        try {
-            String cipherMode = algorithm;
-            if (!blockMode.isEmpty() && !padding.isEmpty()) {
-                cipherMode += '/' + blockMode + '/' + padding;
-            }
-            
-            Cipher cipher = Cipher.getInstance(cipherMode);
-            IvParameterSpec iv = new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-            cipher.init(Cipher.DECRYPT_MODE, secret, iv);
-            
-            byte[] data = Base64.getDecoder().decode(message);
-            return new String(cipher.doFinal(data));
-            
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (IllegalBlockSizeException ignored) {
-            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
-        } catch (NoSuchPaddingException ignored) {
-            logger.error("The padding method: {} does not exist", padding);
-        } catch (BadPaddingException ignored) {
-            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
-        } catch (InvalidAlgorithmParameterException ignored) {
-            logger.error("The IV parameter specification is invalid");
-        } catch (InvalidKeyException ignored) {
-            logger.error("The shared secret provided is invalid");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return "";
+        return message;
+//        String algorithm = AES_ALGORITHM;
+//
+//        try {
+//            String cipherMode = algorithm;
+//            if (!blockMode.isEmpty() && !padding.isEmpty()) {
+//                cipherMode += '/' + blockMode + '/' + padding;
+//            }
+//
+//            Cipher cipher = Cipher.getInstance(cipherMode);
+//            IvParameterSpec iv = new IvParameterSpec(new byte[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+//            cipher.init(Cipher.DECRYPT_MODE, secret, iv);
+//
+//            byte[] data = Base64.getDecoder().decode(message);
+//            return new String(cipher.doFinal(data));
+//
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (IllegalBlockSizeException ignored) {
+//            //logger.error("The block mode: {} can not be used with the algorithm: {}", blockMode, algorithm);
+//        } catch (NoSuchPaddingException ignored) {
+//            logger.error("The padding method: {} does not exist", padding);
+//        } catch (BadPaddingException ignored) {
+//            //logger.error("The padding method: {} can not be used with the algorithm: {} using the block mode: {}", padding, algorithm, blockMode);
+//        } catch (InvalidAlgorithmParameterException ignored) {
+//            logger.error("The IV parameter specification is invalid");
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The shared secret provided is invalid");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return "";
     }
     
     /**
@@ -466,27 +472,28 @@ public final class CryptoUtility
      */
     public static String sign(String message, PrivateKey privateKey, String algorithm, String encoding)
     {
-        try {
-            byte[] data = message.getBytes(encoding);
-            
-            Signature sig = Signature.getInstance(algorithm);
-            sig.initSign(privateKey);
-            sig.update(data);
-            
-            byte[] signature = sig.sign();
-            return Base64.getEncoder().encodeToString(signature);
-            
-        } catch (UnsupportedEncodingException ignored) {
-            logger.error("The encoding: {} is not supported", encoding);
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (InvalidKeyException ignored) {
-            logger.error("The private key provided is invalid");
-        } catch (SignatureException ignored) {
-            logger.error("There was an error while signing the message");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return "";
+        return message;
+//        try {
+//            byte[] data = message.getBytes(encoding);
+//
+//            Signature sig = Signature.getInstance(algorithm);
+//            sig.initSign(privateKey);
+//            sig.update(data);
+//
+//            byte[] signature = sig.sign();
+//            return Base64.getEncoder().encodeToString(signature);
+//
+//        } catch (UnsupportedEncodingException ignored) {
+//            logger.error("The encoding: {} is not supported", encoding);
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The private key provided is invalid");
+//        } catch (SignatureException ignored) {
+//            logger.error("There was an error while signing the message");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return "";
     }
     
     /**
@@ -525,27 +532,28 @@ public final class CryptoUtility
      */
     public static boolean verify(String message, String signature, PublicKey publicKey, String algorithm, String encoding)
     {
-        try {
-            byte[] data = message.getBytes(encoding);
-            
-            Signature sig = Signature.getInstance(algorithm);
-            sig.initVerify(publicKey);
-            sig.update(data);
-            
-            byte[] sigBytes = Base64.getDecoder().decode(signature);
-            return sig.verify(sigBytes);
-            
-        } catch (UnsupportedEncodingException ignored) {
-            logger.error("The encoding: {} is not supported", encoding);
-        } catch (NoSuchAlgorithmException ignored) {
-            logger.error("The algorithm: {} does not exist", algorithm);
-        } catch (InvalidKeyException ignored) {
-            logger.error("The public key provided is invalid");
-        } catch (SignatureException ignored) {
-            logger.error("There was an error while verifying the signature");
-        } catch (IllegalArgumentException ignored) {
-        }
-        return false;
+        return true;
+//        try {
+//            byte[] data = message.getBytes(encoding);
+//
+//            Signature sig = Signature.getInstance(algorithm);
+//            sig.initVerify(publicKey);
+//            sig.update(data);
+//
+//            byte[] sigBytes = Base64.getDecoder().decode(signature);
+//            return sig.verify(sigBytes);
+//
+//        } catch (UnsupportedEncodingException ignored) {
+//            logger.error("The encoding: {} is not supported", encoding);
+//        } catch (NoSuchAlgorithmException ignored) {
+//            logger.error("The algorithm: {} does not exist", algorithm);
+//        } catch (InvalidKeyException ignored) {
+//            logger.error("The public key provided is invalid");
+//        } catch (SignatureException ignored) {
+//            logger.error("There was an error while verifying the signature");
+//        } catch (IllegalArgumentException ignored) {
+//        }
+//        return false;
     }
     
     /**
