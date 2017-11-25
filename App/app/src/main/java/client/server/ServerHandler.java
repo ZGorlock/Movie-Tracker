@@ -581,13 +581,12 @@ public class ServerHandler extends Application
 
         String imageDump = "";
         String imageType = "";
-        //TODO images
-//        try {
-//            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
-//        } catch (IOException e1) {
-//            imageDump = "";
-//        }
-//        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+        try {
+            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+        } catch (IOException e1) {
+            imageDump = "";
+        }
+        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
 
         try {
             RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
@@ -624,14 +623,13 @@ public class ServerHandler extends Application
         String imageDump = "";
         String imageName = "";
         String imageType = "";
-        //TODO images
-//        try {
-//            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
-//        } catch (IOException e1) {
-//            imageDump = "";
-//        }
-//        imageName = image.getName();
-//        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+        try {
+            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+        } catch (IOException e1) {
+            imageDump = "";
+        }
+        imageName = image.getName();
+        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
 
         try {
             RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)

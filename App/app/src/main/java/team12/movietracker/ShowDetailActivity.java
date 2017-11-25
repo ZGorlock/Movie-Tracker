@@ -60,7 +60,7 @@ public class ShowDetailActivity extends AppCompatActivity {
         mYear = (TextView) findViewById(R.id.textViewYear);
 
 
-        ServerHandler.setupServerHandler();
+//        ServerHandler.setupServerHandler();
         Media retrivevedMedia = new Media();
         retrivevedMedia = ServerHandler.retrieveMedia(mMediaID);
         try{

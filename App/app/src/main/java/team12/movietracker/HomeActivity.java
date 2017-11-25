@@ -139,7 +139,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
     @Override
     protected void onResume() {
         super.onResume();
-        ServerHandler.setupServerHandler();
+//        ServerHandler.setupServerHandler();
         if(firstCreate)
         {
             mUsername = getIntent().getStringExtra("USER");
