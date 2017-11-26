@@ -22,6 +22,9 @@ import android.support.v4.app.NavUtils;
 
 import java.util.List;
 
+import client.pojo.User;
+import client.server.ServerHandler;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -39,6 +42,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+    private String mUsername;
+    private String mPassword;
+
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -121,6 +127,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        mUsername = getIntent().getStringExtra("USER");
+        mPassword = getIntent().getStringExtra("PASS");
+        User user = ServerHandler.validateUser(mUsername, mPassword);
     }
 
     /**

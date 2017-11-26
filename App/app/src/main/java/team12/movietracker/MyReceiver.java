@@ -156,7 +156,7 @@ public class MyReceiver extends BroadcastReceiver {
         String title = "Movie Time!";
         String body = output + " until your movie";
 
-        if(output == "None")
+        if(output.toUpperCase().equals( "NONE"))
         {
             body = "Your movie is starting now!";
         }

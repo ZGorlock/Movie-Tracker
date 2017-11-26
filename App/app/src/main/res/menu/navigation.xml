@@ -12,9 +12,9 @@
         android:icon="@android:drawable/ic_menu_compass"
         android:title="@string/title_suggestions" />
 
-    <item
-        android:id="@+id/navigation_favorites"
-        android:icon="@android:drawable/ic_menu_edit"
-        android:title="@string/title_favorites" />
+    <!--<item-->
+        <!--android:id="@+id/navigation_favorites"-->
+        <!--android:icon="@android:drawable/ic_menu_edit"-->
+        <!--android:title="@string/title_favorites" />-->
 
 </menu>

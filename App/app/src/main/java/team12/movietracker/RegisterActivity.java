@@ -63,12 +63,12 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void attemptRegister()
     {
-        String firstName ="umar";// mFirstName.getText().toString();
-        String lastName ="Waqas";// mLastName.getText().toString();
-        String username = "umar11";//mUserName.getText().toString();
-        String password = "11111111";////mPassword.getText().toString();
-        String passwordConfirm = "11111111";//mPasswordConfirm.getText().toString();
-        String email = "test@as.as";mEmail.getText().toString();
+        String firstName = mFirstName.getText().toString();
+        String lastName = mLastName.getText().toString();
+        String username = mUserName.getText().toString();
+        String password = mPassword.getText().toString();
+        String passwordConfirm = mPasswordConfirm.getText().toString();
+        String email = mEmail.getText().toString();
 
 
         mFirstName.setError(null);
