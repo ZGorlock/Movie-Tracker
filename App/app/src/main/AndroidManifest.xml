@@ -4,8 +4,6 @@
    <!-- <uses-sdk android:minSdkVersion="26"/>-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 
     <!-- To auto-complete the email text field in the login form with the user's emails -->
@@ -20,7 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginActivity"
+            android:name=".HomeActivity"
             android:configChanges="orientation"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
@@ -32,9 +30,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:launchMode="singleTop"/>
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_home" />
         <activity
             android:name=".RegisterActivity"
             android:label="@string/title_activity_register"
@@ -99,25 +96,7 @@
         <activity
             android:name=".ShowDetailActivity"
             android:label="@string/title_activity_show_detail"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="team12.movietracker.HomeActivity" />
-        </activity>
-
-        <receiver
-            android:name=".MyReceiver"
-            android:enabled="true"
-            android:exported="true" >
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.BOOT_COMPLETED" />-->
-            <!--</intent-filter>-->
-        </receiver>
-
-        <!--<service-->
-            <!--android:name=".MyIntentService"-->
-            <!--android:exported="false" >-->
-        <!--</service>-->
+            android:theme="@style/AppTheme.NoActionBar" />
 
        <activity
             android:name="com.facebook.FacebookActivity"
@@ -138,7 +117,6 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
-
     </application>
 
 </manifest>
