@@ -7,13 +7,15 @@
 package client.server;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
-import com.squareup.okhttp.MultipartBuilder;
+/*import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+import com.squareup.okhttp.Response;*/
 //import com.sun.jna.platform.FileUtils;
 
 import org.json.simple.JSONArray;
@@ -41,8 +43,16 @@ import javax.crypto.SecretKey;
 import client.pojo.Media;
 import client.pojo.User;
 import client.utility.CryptoUtility;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
-public class ServerHandler extends Application
+public class ServerHandler //extends Application
 {
     
     //Constants
@@ -60,7 +70,7 @@ public class ServerHandler extends Application
     /**
      * The regex pattern for a Content-Disposition header.
      */
-    public static final Pattern CONTENT_DISPOSITION_PATTERN = Pattern.compile("attachment; filename=(?<filename>.*); size=(?<filesize>.*);");
+//    public static final Pattern CONTENT_DISPOSITION_PATTERN = Pattern.compile("attachment; filename=(?<filename>.*); size=(?<filesize>.*);");
     
     
     //Static Fields
@@ -226,7 +236,9 @@ public class ServerHandler extends Application
      */
     public static boolean addMedia(Media media)
     {
-        return mediaAdd(media.getImage(), media.getTitle(), media.getType(), media.getDescription(), media.getGenre(), media.getActors(), media.getShowtimes(), media.getRating(), String.valueOf(media.getYear()));
+        byte[]   imageString=imageToString(media.getImageBitmap());
+        return mediaAdd(imageString, media.getTitle(), media.getType(), media.getDescription(), media.getGenre(), media.getActors(), media.getShowtimes(), media.getRating(), String.valueOf(media.getYear()));
+       // return mediaAdd(media.getImage(), media.getTitle(), media.getType(), media.getDescription(), media.getGenre(), media.getActors(), media.getShowtimes(), media.getRating(), String.valueOf(media.getYear()));
     }
 
     /**
@@ -386,7 +398,7 @@ public class ServerHandler extends Application
 
         long commId;
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("rsaPublicKeyStore", rsaPublicKeyStore)
                     .addFormDataPart("dsaPublicKeyStore", dsaPublicKeyStore).build();
             Request request = new Request.Builder().header("Content-type", "text/plain")
@@ -437,7 +449,7 @@ public class ServerHandler extends Application
         }
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("commId", String.valueOf(commId))
                     .addFormDataPart("aesKeyStore", aesKeyStore).build();
             Request request = new Request.Builder().header("Content-type", "text/plain")
@@ -475,7 +487,7 @@ public class ServerHandler extends Application
         String url = BASE_URI + "registerUser";
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("user", user)
                     .addFormDataPart("passHash", passHash)
                     .addFormDataPart("signature", signature)
@@ -515,7 +527,7 @@ public class ServerHandler extends Application
         String url = BASE_URI + "validateUser";
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("user", user)
                     .addFormDataPart("passHash", passHash)
                     .addFormDataPart("signature", signature)
@@ -550,7 +562,7 @@ public class ServerHandler extends Application
         String url = BASE_URI + "authorizeUser";
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("user", user)
                     .addFormDataPart("passHash", passHash)
                     .addFormDataPart("signature", signature)
@@ -581,15 +593,16 @@ public class ServerHandler extends Application
 
         String imageDump = "";
         String imageType = "";
-        try {
+        //TODO images
+       /* try {
             imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
         } catch (IOException e1) {
             imageDump = "";
-        }
+        }*/
         imageType = image.getName().substring(image.getName().indexOf('.') + 1);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("title", title)
                     .addFormDataPart("type", type)
                     .addFormDataPart("description", description)
@@ -613,6 +626,66 @@ public class ServerHandler extends Application
             return false;
         }
     }
+static Response res;
+    private static boolean mediaAdd(byte[] imageString, String title, String type, String description, String genre, String actors, String showtimes, String rating, String year)
+    {
+        String url = BASE_URI + "addMedia";
+
+        String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
+
+        String imageDump = "";
+        String imageType = "";
+        /*//TODO images
+        try {
+            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+        } catch (IOException e1) {
+            imageDump = "";
+        }*/
+        imageType = "unnamed_image.png".substring("unnamed_image.png".indexOf('.') + 1);
+
+        try {
+
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
+                    .addFormDataPart("title", title)
+                    .addFormDataPart("type", type)
+                    .addFormDataPart("description", description)
+                    .addFormDataPart("genre", genre)
+                    .addFormDataPart("actors", actors)
+                    .addFormDataPart("imageDump", "unnamed_image.png",
+                            RequestBody.create(MediaType.parse("image/png"), imageString))
+                   // .addFormDataPart("imageDump", imageString)
+                    .addFormDataPart("imageType", imageType)
+                    .addFormDataPart("showtimes", showtimes)
+                    .addFormDataPart("rating", rating)
+                    .addFormDataPart("year", year)
+                    .addFormDataPart("authToken", encryptedAuthToken)
+                    .addFormDataPart("commId", String.valueOf(serverCommId)).build();
+            Request request = new Request.Builder().header("Content-type", "text/plain")
+                    .url(url).post(requestBody).build();
+
+        //    Response response = client.newCall(request).execute();
+            okhttp3.Call call = client.newCall(request);
+            // Response res=null;
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("","");
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+
+                    res=response;
+                    Log.d("","");
+                }
+            });
+
+            return printResponse(res);
+
+        } catch (Exception e) {
+            return false;
+        }
+    }//end of method mediaAdd....
 
     private static boolean mediaEdit(String mediaId, File image, String title, String type, String description, String genre, String actors, String showtimes, String rating, String year)
     {
@@ -623,16 +696,17 @@ public class ServerHandler extends Application
         String imageDump = "";
         String imageName = "";
         String imageType = "";
-        try {
-            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
-        } catch (IOException e1) {
-            imageDump = "";
-        }
-        imageName = image.getName();
-        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+        //TODO images
+//        try {
+//            imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+//        } catch (IOException e1) {
+//            imageDump = "";
+//        }
+//        imageName = image.getName();
+//        imageType = image.getName().substring(image.getName().indexOf('.') + 1);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("mediaId", mediaId)
                     .addFormDataPart("title", title)
                     .addFormDataPart("type", type)
@@ -666,7 +740,7 @@ public class ServerHandler extends Application
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("mediaId", mediaId)
                     .addFormDataPart("authToken", encryptedAuthToken)
                     .addFormDataPart("commId", String.valueOf(serverCommId)).build();
@@ -687,7 +761,7 @@ public class ServerHandler extends Application
         String url = BASE_URI + "queryMedia";
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("title", title)
                     .addFormDataPart("type", type)
                     .addFormDataPart("producerId", producerId)
@@ -718,7 +792,7 @@ public class ServerHandler extends Application
         String url = BASE_URI + "retrieveMedia";
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("mediaId", mediaId).build();
             Request request = new Request.Builder().header("Content-type", "text/plain")
                     .url(url).post(requestBody).build();
@@ -730,33 +804,33 @@ public class ServerHandler extends Application
             }
 
             //TODO images
-//            String imageName = response.header("image");
-//            if (imageName != null) {
-//
-//                File imageStore = new File("images" + File.separator + imageName);
-//                if (!imageStore.exists()) {
-//
-//                    File dir = new File("images");
-//                    if (!dir.exists() || !dir.isDirectory()) {
-//                        Files.createDirectory(Paths.get(dir.getAbsolutePath()));
-//                    }
-//                    Files.createFile(Paths.get(imageStore.getAbsolutePath()));
-//
-//                    String imageDump = response.header("imageDump");
-//                    if (imageDump != null && !imageDump.isEmpty()) {
-//                        byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
-//
-//                        try {
-//                            FileOutputStream fos = new FileOutputStream(imageStore);
-//                            fos.write(data);
-//                            fos.close();
-//
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
+            String imageName = response.header("image");
+            /*if (imageName != null) {
+
+                File imageStore = new File("images" + File.separator + imageName);
+                if (!imageStore.exists()) {
+
+                    File dir = new File("images");
+                    if (!dir.exists() || !dir.isDirectory()) {
+                        Files.createDirectory(Paths.get(dir.getAbsolutePath()));
+                    }
+                    Files.createFile(Paths.get(imageStore.getAbsolutePath()));
+
+                    String imageDump = response.header("imageDump");
+                    if (imageDump != null && !imageDump.isEmpty()) {
+                        byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
+
+                        try {
+                            FileOutputStream fos = new FileOutputStream(imageStore);
+                            fos.write(data);
+                            fos.close();
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }*/
 
             return response.header("mediaInfo");
 
@@ -772,7 +846,7 @@ public class ServerHandler extends Application
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("mediaId", mediaId)
                     .addFormDataPart("authToken", encryptedAuthToken)
                     .addFormDataPart("commId", String.valueOf(serverCommId)).build();
@@ -795,7 +869,7 @@ public class ServerHandler extends Application
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("mediaId", mediaId)
                     .addFormDataPart("authToken", encryptedAuthToken)
                     .addFormDataPart("commId", String.valueOf(serverCommId)).build();
@@ -818,7 +892,7 @@ public class ServerHandler extends Application
         String encryptedAuthToken = ClientCommunicationHandler.encryptCommunication(serverCommId, authToken);
 
         try {
-            RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)
+            RequestBody requestBody = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("authToken", encryptedAuthToken)
                     .addFormDataPart("commId", String.valueOf(serverCommId)).build();
             Request request = new Request.Builder().header("Content-type", "text/plain")
@@ -836,5 +910,47 @@ public class ServerHandler extends Application
             return "";
         }
     }
+
+    public static byte[] imageToString(Bitmap image)
+    {
+        if (image!=null) {
+
+            ByteArrayOutputStream stream=new ByteArrayOutputStream();
+            image.compress(Bitmap.CompressFormat.PNG,50,stream);
+            byte[] imageAry=stream.toByteArray();
+            String encodedImage =  android.util.Base64.encodeToString(imageAry, android.util.Base64.DEFAULT);
+            android.util.Base64.encodeToString(imageAry, android.util.Base64.DEFAULT);
+            return imageAry;
+            //return encodedImage;
+        }
+
+        else
+            return null;
+    }//end of method imageToString....
+
+    public static synchronized Bitmap stringToImage(String imageString)
+    {
+        Bitmap bitmap=null;
+        if (imageString!=null)
+        {
+            byte [] imageBytes=android.util.Base64.decode(imageString,android.util.Base64.NO_WRAP);
+            bitmap= BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+            return bitmap;
+        }
+        else
+            return null;
+    }//end of method stringToImage....
+
+    public static synchronized Bitmap bytesToImage(byte[] imageBytes)
+    {
+        Bitmap bitmap=null;
+        if (imageBytes!=null)
+        {
+            bitmap= BitmapFactory.decodeByteArray(imageBytes,0,imageBytes.length);
+            return bitmap;
+        }
+        else
+            return null;
+    }//end of method bytesToImage....
     
-}
+}//end of class ServerHandler....

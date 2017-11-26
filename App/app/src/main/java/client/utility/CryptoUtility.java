@@ -881,7 +881,13 @@ public final class CryptoUtility
      */
     public static SecretKey readAESSecret(String store)
     {
-        byte[] key = Base64.getDecoder().decode(store);
+       /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Base64.getDecoder().decode(str)
+        } else {
+            Base64.decode(str, Base64.DEFAULT) // Unresolved reference: decode
+        }*/
+        //byte[] key = Base64.getDecoder().decode(store);
+        byte[] key = android.util.Base64.decode(store, android.util.Base64.DEFAULT);
         return new SecretKeySpec(key, AES_ALGORITHM);
     }
     

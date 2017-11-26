@@ -1,59 +1,56 @@
 package team12.movietracker;
 
-import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.RingtoneManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.StrictMode;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.io.File;
 import java.util.List;
 
 import client.pojo.Media;
 import client.pojo.User;
 import client.server.ServerHandler;
+import team12.movietracker.adapters.ImagesAdapter;
+import team12.movietracker.utils.Common;
 
 //TODO: Setup Links to Help, Settings, and Suggestions
 //TODO: Setup Search
 
-public class HomeActivity extends AppCompatActivity implements RecyclerItemClickListener.OnRecyclerClickListener {
+public class HomeActivity extends AppCompatActivity {
+
     private SearchView mSearchView;
     static final String SEARCH_QUERY = "";
-    private String mUsername;
-    private String mPassword;
-    private DetailRecyclerViewAdapter mDetailRecyclerViewAdapter;
-    private displayHomeBrowse mdHBTask = null;
-    private startNotifications mNotifications = null;
-    private boolean firstCreate = true;
+
+    //region View object References
+    private RecyclerView mRecyclerView;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    //endregion
+
+    //region Other Complex objects Variables
+    private final String TAG = getClass().getSimpleName();
+    private Context context;
+    private ImagesAdapter mAdapter;
+    private List<Media> mediaList;
+    //endregion
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -63,22 +60,16 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
             switch (item.getItemId()) {
                 case R.id.navigation_help:
                     Intent displayHelp = new Intent(HomeActivity.this, HelpActivity.class);
-                    displayHelp.putExtra("USER",mUsername);
-                    displayHelp.putExtra("PASS",mPassword);
                     startActivity(displayHelp);
                     return true;
                 case R.id.navigation_suggestions:
                     Intent displaySuggestions = new Intent(HomeActivity.this, SuggestionsActivity.class);
-                    displaySuggestions.putExtra("USER",mUsername);
-                    displaySuggestions.putExtra("PASS",mPassword);
                     startActivity(displaySuggestions);
                     return true;
-//                case R.id.navigation_favorites:
-//                    Intent displayFavorites = new Intent(HomeActivity.this, FavoritesActivity.class);
-//                    displayFavorites.putExtra("USER",mUsername);
-//                    displayFavorites.putExtra("PASS",mPassword);
-//                    startActivity(displayFavorites);
-//                    return true;
+                case R.id.navigation_favorites:
+                    Intent displayFavorites = new Intent(HomeActivity.this, FavoritesActivity.class);
+                    startActivity(displayFavorites);
+                    return true;
             }
             return false;
         }
@@ -104,8 +95,6 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 sharedPreferences.edit().putString(SEARCH_QUERY, query).apply();
                 Intent displaySearch = new Intent(HomeActivity.this,SearchResultsActivity.class);
-                displaySearch.putExtra("USER",mUsername);
-                displaySearch.putExtra("PASS",mPassword);
                 startActivity(displaySearch);
                 return true;
             }
@@ -124,386 +113,154 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
         if(id == R.id.displaySettings)
         {
             Intent displaySettings = new Intent(HomeActivity.this, SettingsActivity.class);
-            displaySettings.putExtra("USER",mUsername);
-            displaySettings.putExtra("PASS",mPassword);
             startActivity(displaySettings);
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void onItemClick(View view, int position) {
-        Intent intent = new Intent(this, ShowDetailActivity.class);
-        intent.putExtra("USER",mUsername);
-        intent.putExtra("PASS",mPassword);
-        intent.putExtra("MEDIAID",mDetailRecyclerViewAdapter.getSub(position));
-        startActivity(intent);
-    }
-
-    @Override
-    public void onItemLongClick(View view, int position) {
-//        Intent intent = new Intent(this, ShowDetailActivity.class);
-//        intent.putExtra("USER",mUsername);
-//        intent.putExtra("PASS",mPassword);
-//        intent.putExtra("MEDIAID",mDetailRecyclerViewAdapter.getSub(position));
-//        startActivity(intent);
-//
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        ServerHandler.setupServerHandler();
-        if(firstCreate)
-        {
-            mUsername = getIntent().getStringExtra("USER");
-            System.out.println(mUsername);
-            mPassword = getIntent().getStringExtra("PASS");
-            System.out.println(mPassword);
-        }
-        else
-        {
-            System.out.println(mUsername);
-            System.out.println(mPassword);
-        }
-
-
-
-        String token = ServerHandler.authorizeUser(mUsername, mPassword);
-        List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
-
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
-        recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
-
-        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
-
-        mNotifications = new startNotifications(subscriptions1);
-        mNotifications.execute();
-
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        mUsername = getIntent().getStringExtra("USER");
-        mPassword = getIntent().getStringExtra("PASS");
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
+        preStart();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        firstCreate = false;
-//        mdHBTask.execute(); MAYBE TRY TO GET THIS TO ANOTHER THREAD THAN MAIN
-//        ServerHandler.setupServerHandler();
-//        String token = ServerHandler.authorizeUser(mUsername, mPassword);
-//        List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
-//
-//        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-//
-//        mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
-//        recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-//        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
-//
-//        recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
+      //  initData();
+        initViews();
+        new MediaAddTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+
+    }//end of mehtod onCreate....
+
+    private void preStart() {
+        setContentView(R.layout.activity_home);
+        context = this;
+    }//end of preStart....
+
+    private void initData() {
+        ServerHandler.setupServerHandler();
 
 
 
 
+        String testUser = "tmp" + ((int)(Math.random() * 10000) + 1);
+        String testProducer = "producer" + ((int)(Math.random() * 10000) + 1);
+        String testPass = "password";
 
 
 
+        //register the producer on the server
 
+        //usernames, first names, and lastnames <= 32 character
+        //emails <= 64 characters
+        //Log.d("TEST:", "Calling .registerUser");
+        boolean registered = ServerHandler.registerUser(testProducer, testPass, "email@email.com", "Mr", "Producer", true);
 
-
-    }
-    public class startNotifications extends AsyncTask<Void, Void, Boolean>
-    {
-        private List<Integer> mSubs;
-        public startNotifications(List<Integer> subs)
-        {
-            mSubs = subs;
+        if (registered) {
+            System.out.println("Producer: " + testProducer + " registered with id: " + ServerHandler.userId);
+        } else {
+            System.out.println("Producer: " + testProducer + " could not be registered");
+            return;
         }
+
+
+        //essentially logging in, making sure the credentials are good and returning a User object
+
+        User user = ServerHandler.validateUser(testProducer, testPass);
+        if (user == null) {
+            return;
+        }
+        System.out.println("Producer data: " + user.toString());
+
+
+        //authorize producer, get an auth token allowing them to make changes to the database, the auth token is required for some endpoints
+
+        String token = ServerHandler.authorizeUser(testProducer, testPass);
+        System.out.println("Producer authorized with auth token: " + token);
+        Bitmap imageBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.unnamed_image);
+        Media media1 = new Media();
+        media1.setTitle("The Show");
+        media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
+        //media1.setProducerId(); no need to set this, the server takes care of it
+        media1.setDescription("This is the TV Show.");
+        media1.setGenre("Drama");
+        media1.setActors("Lionard Deprapio; Jecca Simons; Kristofar Wakin;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+        //media1.setImage(new File("resources/unnamed.png"));
+        media1.setImageBitmap(imageBitmap);
+        media1.setShowtimes("Nov 17, 2017 11:00 PM; Nov 19, 217 08:00 PM;"); //same with the format and delimination of these
+        media1.setRating("R");
+        media1.setYear(2017);
+
+        ServerHandler.addMedia(media1);
+
+        media1.setTitle("The other Show");
+        media1.setDescription("This is the other TV Show.");
+        media1.setShowtimes("Dec 1, 2017 01:00 PM;");
+
+        ServerHandler.addMedia(media1);
+
+        media1.setTitle("The Movie");
+        media1.setType("Movie");
+        media1.setDescription("This is the movie.");
+        media1.setShowtimes("Dec 7, 2017 01:00 PM;");
+
+        ServerHandler.addMedia(media1);
+
+        media1.setTitle("The other Movie");
+        media1.setDescription("This is the other Movie.");
+        media1.setShowtimes("Dec 3, 2017 01:00 PM;");
+
+        ServerHandler.addMedia(media1);
+        //query the current media by this producer
+
+        Media queryMedia = new Media();
+        queryMedia.setProducerId(ServerHandler.userId); //anything set in this query Media will be used as a parameter in the search. producerId and year require exact matches, everything else will perform a "string contains" operation. Any parameter with a ';' will be discarded as safety against sql injection. This means you cannot search multiple actors or showtimes at once.
+        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
+        for (int i : currentMedia) {
+            System.out.println("Query returned Media: " + i);
+        }
+
+
+        //retrieve a media
+
+        Media retrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(0)); //retrieve the first media in the list, this will return a usable Media entity. This will also download the media's image to the images/ folder, but only the first time. You can get the image from the image field in the entity.
+        System.out.println(retrievedMedia.toString());
+
+
+        Log.d("","");
+    }//end of initData....
+
+    private void initViews() {
+        initRecyclerView();
+    }//end of initViews....
+
+    //initializing RecyclerView....
+    public void initRecyclerView() {
+        try {
+            mRecyclerView = (RecyclerView) findViewById(R.id.rv_imageList);
+            mLayoutManager = new LinearLayoutManager(context);
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            //mAdapter=new ImagesAdapter(context);
+            mRecyclerView.setAdapter(mAdapter);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }//end of initRecyclerView.....
+
+    public class MediaAddTask extends AsyncTask<Void,Void,Void>{
+
         @Override
-        protected Boolean doInBackground(Void... voids)
-        {
-            SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-            boolean notificationONOFF = SP.getBoolean("notifications_new_message", false);
-            String output = SP.getString("list_preference_1","0");
-            output = output.toUpperCase();
-            System.out.println("Made it1");
-            if(output.contains("MINUTES"))
-            {
-                output = output.replace(" MINUTES","");
-            }
-            else if(output.contains("NONE"))
-            {
-                output = output.replace("NONE","0");
-            }
-            int delayValue = Integer.parseInt(output);
-            System.out.println("Made it2");
-
-            System.out.println("Made it3");
-
-
-            ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
-            Media retrievedMedia = new Media();
-            String tempShowTime;
-            String tempShowArray[];
-            String tempDividedArray[];
-            String tempMonth;
-            String tempTime[];
-            String tempJ;
-            int month;
-            int day;
-            int year;
-            int hour;
-            int minute;
-            int alarmNumber = 0;
-            boolean AM;
-            for(int i : mSubs)
-            {
-
-                retrievedMedia = ServerHandler.retrieveMedia(i);
-                try
-                {
-                    System.out.println("Made it Try"+i);
-                    tempShowTime = retrievedMedia.getShowtimes();
-                    System.out.println(tempShowTime);
-                    tempShowArray = tempShowTime.split(";");
-                    for(String j:tempShowArray)
-                    {
-                        tempJ = j.trim();
-                        tempDividedArray = tempJ.split(" ");
-                        System.out.println(j);
-                        /*
-                        Nov 17, 2017 11:00 PM
-                        tempDividedArray[0] = Month
-                        tempDividedArray[1] = Day
-                        tempDividedArray[2] = Year
-                        tempDividedArray[3] = Time
-                        tempDividedArray[4] = AM/PM
-                         */
-                        tempMonth = tempDividedArray[0].toUpperCase();
-                        System.out.println(tempDividedArray[0]);
-                        System.out.println(tempDividedArray[1]);
-                        System.out.println(tempDividedArray[2]);
-                        System.out.println(tempDividedArray[3]);
-                        System.out.println(tempDividedArray[4]);
-
-                        switch(tempMonth) {
-                            case "JAN":
-                                month = 0;
-                                break;
-                            case "FEB":
-                                month = 1;
-                                break;
-                            case "MAR":
-                                month = 2;
-                                break;
-                            case "APR":
-                                month = 3;
-                                break;
-                            case "MAY":
-                                month = 4;
-                                break;
-                            case "JUN":
-                                month = 5;
-                                break;
-                            case "JUL":
-                                month = 6;
-                                break;
-                            case "AUG":
-                                month = 7;
-                                break;
-                            case "SEP":
-                                month = 8;
-                                break;
-                            case "OCT":
-                                month = 9;
-                                break;
-                            case "NOV":
-                                month = 10;
-                                break;
-                            case "DEC":
-                                month = 11;
-                                break;
-                            default:
-                                month = 0;
-                                break;
-                        }
-                        tempDividedArray[1] = tempDividedArray[1].replace(",","");
-                        day = Integer.parseInt(tempDividedArray[1]);
-                        year = Integer.parseInt(tempDividedArray[2]);
-                        tempTime = tempDividedArray[3].split(":");
-                        hour = Integer.parseInt(tempTime[0]);
-                        minute = Integer.parseInt(tempTime[1]);
-
-                        minute = minute - delayValue;
-                        if(minute < 0)
-                        {
-                            hour = hour -1;
-                            minute = minute + 60;
-                        }
-
-
-                        if(tempDividedArray[4].contains("AM"))
-                        {
-                            AM = true;
-                            if(hour == 12)
-                            {
-                                hour += 12;
-                            }
-
-                        }
-                        else
-                        {
-                            AM = false;
-                            if(hour != 12)
-                            {
-                                hour = hour + 12;
-
-                            }
-                        }
-
-
-
-
-                        Intent notifyIntent = new Intent(HomeActivity.this,MyReceiver.class);
-//                        if()
-//                        notifyIntent.putExtra("DELAY", )
-
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.set(Calendar.MONTH, month);
-                        calendar.set(Calendar.DATE, day);
-                        calendar.set(Calendar.YEAR, year);
-                        calendar.set(Calendar.HOUR_OF_DAY, hour);
-                        calendar.set(Calendar.MINUTE, minute);
-                        calendar.set(Calendar.SECOND, 1);
-
-
-//                        calendar.set(Calendar.MONTH, 10);
-//                        calendar.set(Calendar.DATE, 25);
-//                        calendar.set(Calendar.YEAR, 2017);
-//                        calendar.set(Calendar.HOUR_OF_DAY, 11);
-//                        calendar.set(Calendar.MINUTE, 52);
-//                        calendar.set(Calendar.SECOND, 1);
-
-                        Calendar cal2 = Calendar.getInstance();
-                        System.out.println("Alarm set to "+calendar.getTimeInMillis() + " current time is: "+cal2.getTimeInMillis());
-                        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-                        if(cal2.getTimeInMillis()<=calendar.getTimeInMillis())
-                        {
-                            PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarmNumber, notifyIntent, 0);
-                            manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-                            alarmNumber++;
-                            intentArray.add(pendingIntent);
-                        }
-                        else
-                        {
-                            if(tempShowArray[tempShowArray.length-1].equals(j))
-                            {
-                                ServerHandler.removeSubscription(i);
-
-                            }
-                        }
-
-
-
-                        if(!notificationONOFF)
-                        {
-                            for(PendingIntent k: intentArray)
-                            {
-                                manager.cancel(k);
-                            }
-                        }
-                    }
-
-
-
-                }
-                catch (NullPointerException e)
-                {
-                    System.out.println("Made it catch"+i);
-                    Log.d("HomeActivityStartNotification", "Unable to get ShowTimes:" + e);
-                }
-
-            }
-//            NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                NotificationChannel notificationChannel = new NotificationChannel("my_notification_channel", "My Notifications", NotificationManager.IMPORTANCE_DEFAULT);
-//
-//                // Configure the notification channel.
-//                notificationChannel.setDescription("Channel description");
-//                notificationChannel.enableLights(true);
-//                notificationChannel.setLightColor(Color.RED);
-//                notificationManager.createNotificationChannel(notificationChannel);
-//            }
-//
-//            NotificationCompat.Builder builder = new NotificationCompat.Builder(HomeActivity.this, "my_notification_channel")
-//                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
-//                    .setSmallIcon(R.drawable.movietrack)
-//                    .setContentTitle("Content Title")
-//                    .setContentText("Content Text");
-//
-//            notificationManager.notify(1, builder.build());
-            return true;
-        }
-    }
-
-    public class displayHomeBrowse extends AsyncTask<Void, Void, Boolean> {
-
-
-        public displayHomeBrowse()
-        {
-
+        protected Void doInBackground(Void... voids) {
+            initData();
+            return null;
         }
 
         @Override
-        protected Boolean doInBackground(Void... voids) {
-//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//            StrictMode.setThreadPolicy(policy);
-            System.out.println("Here");
-
-            ServerHandler.setupServerHandler();
-            System.out.println("Here");
-            String token = ServerHandler.authorizeUser(mUsername, mPassword);
-            System.out.println("Here");
-            List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
-            System.out.println("Here");
-            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            System.out.println("Here");
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-            System.out.println("Here");
-
-
-            mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(HomeActivity.this, new ArrayList<Integer>());
-            System.out.println("Here");
-
-            recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-            System.out.println("Here");
-
-            mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
-            System.out.println("Here");
-
-
-            recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(HomeActivity.this, recyclerView, HomeActivity.this));
-            System.out.println("Here");
-
-            return true;
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
         }
     }
 
-
-
-}
+}//end of class HomeActivity....

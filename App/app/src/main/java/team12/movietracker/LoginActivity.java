@@ -37,6 +37,7 @@ import java.util.List;
 import client.Test;
 import client.pojo.User;
 import client.server.ServerHandler;
+import team12.movietracker.utils.Common;
 
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -70,7 +71,6 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,8 +172,8 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
         mPasswordView.setError(null);
 
         // Store values at the time of the login attempt.
-        String username = mUsernameView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String username = "umar11";mUsernameView.getText().toString();
+        String password = "11111111";mPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -325,7 +325,6 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
         private final String mUsername;
         private final String mPassword;
 
-
         UserLoginTask(String username, String password) {
             mUsername = username;
             mPassword = password;
@@ -342,6 +341,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
                     return false;
                 }
                 else{
+                    Common.user=user;
                     return true;
                 }
             } catch (Exception e) {
@@ -365,10 +365,6 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
 
             if (success) {
                 Intent displayHome = new Intent(LoginActivity.this, HomeActivity.class);
-                displayHome.putExtra("USER",mUsername);
-                displayHome.putExtra("PASS",mPassword);
-                mUsernameView.clearFocus();
-                mPasswordView.clearFocus();
                 startActivity(displayHome);
                 showProgress(false);
             } else {

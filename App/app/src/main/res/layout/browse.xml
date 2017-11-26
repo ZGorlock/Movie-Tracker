@@ -8,7 +8,7 @@
     android:weightSum="3">
 
     <ImageView
-        android:id="@+id/posterBrowse"
+        android:id="@+id/poster"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -17,20 +17,11 @@
         app:srcCompat="@drawable/ic_image_black_48dp" />
 
     <TextView
-        android:id="@+id/titleBrowse"
+        android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_weight="2"
-        android:text="TextView" />
-
-    <TextView
-        android:id="@+id/showtimeBrowse"
-        android:layout_width="64dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_weight="1"
         android:text="TextView" />
 </LinearLayout>

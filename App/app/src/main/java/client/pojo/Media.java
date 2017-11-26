@@ -6,6 +6,8 @@
 
 package client.pojo;
 
+import android.graphics.Bitmap;
+
 import java.io.File;
 
 public class Media
@@ -18,6 +20,7 @@ public class Media
     private String genre = "";
     private String actors = "";
     private File image = null;
+    private Bitmap imageBitmap = null;
     private String showtimes = "";
     private String rating = "";
     private int year = 0;
@@ -143,4 +146,14 @@ public class Media
     {
         this.year = year;
     }
+
+
+    public Bitmap getImageBitmap() {
+        return imageBitmap;
+    }
+
+    public void setImageBitmap(Bitmap imageBitmap) {
+        this.imageBitmap = imageBitmap;
+    }
+
 }
