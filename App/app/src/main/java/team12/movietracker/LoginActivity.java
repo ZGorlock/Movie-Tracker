@@ -38,6 +38,20 @@ import client.Test;
 import client.pojo.User;
 import client.server.ServerHandler;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
@@ -64,6 +78,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
+    private FBRegisterTask FBAuthTask = null;
 
     // UI references.
     private AutoCompleteTextView mUsernameView;
@@ -71,10 +86,14 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
     private View mProgressView;
     private View mLoginFormView;
 
+    private LoginButton FBLoginButton;
+    public CallbackManager callbackManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(this);
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
@@ -110,6 +129,130 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
         });
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        initFacebook();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent result){
+        super.onActivityResult(requestCode,resultCode, result );
+        callbackManager.onActivityResult(requestCode, resultCode, result);
+    }
+
+
+    private void initFacebook() {
+        FBLoginButton = findViewById(R.id.FBlogin_button);
+        // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+        callbackManager = CallbackManager.Factory.create();
+        // Register Callback
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(final LoginResult loginResult) {
+                System.out.println("onSuccess: Get Information");
+                Profile profile = Profile.getCurrentProfile();
+                GraphRequest request = GraphRequest.newMeRequest(
+                        loginResult.getAccessToken(),
+                        new GraphRequest.GraphJSONObjectCallback() {
+                            @Override
+                            public void onCompleted(JSONObject object, GraphResponse response) {
+                                Log.v("LoginActivity", response.toString());
+                                try {
+                                    String FBid = object.getString("id");
+                                    String FBEmail = object.getString("email");
+                                    String Firstname= object.getString("first_name");
+                                    String Lastname = object.getString("last_name");
+                                    // Print out info
+                                    Log.v("id = ", " " + FBid);
+                                    Log.v("Email = ", " " + FBEmail);
+                                    Log.v("First Name = ", " " + Firstname);
+                                    Log.v("First Name = ", " " + Lastname);
+                                    // Use data to Register and login
+                                    FBAuthTask = new FBRegisterTask(FBid,"facebookpassword",FBEmail,Firstname,Lastname);
+                                    FBAuthTask.execute((Void) null);
+                                }
+                                catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "id,first_name,last_name,email");
+                request.setParameters(parameters);
+                request.executeAsync();
+            }
+
+            @Override
+            public void onCancel() {
+                System.out.println("onCancel");
+                // LoginManager.getInstance().logOut();
+            }
+
+            @Override
+            public void onError(FacebookException e) {
+                System.out.println("Error");
+
+            }
+        });
+    }
+
+    // Facebook Register and Login
+    public class FBRegisterTask extends AsyncTask<Void, Void, Boolean> {
+
+        private final String fbUsername;
+        private final String fbPassword;
+        private final String fbEmail;
+        private final String fbFirstName;
+        private final String fbLastName;
+
+        FBRegisterTask(String username, String password, String email, String firstname, String lastname) {
+            fbUsername = username;
+            fbPassword = password;
+            fbEmail = email;
+            fbFirstName = firstname;
+            fbLastName = lastname;
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+
+
+            ServerHandler.setupServerHandler();
+
+            boolean registered = ServerHandler.registerUser(fbUsername, fbPassword, fbEmail, fbFirstName, fbLastName, false);
+            if (registered) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(final Boolean success) {
+
+            if (success) {
+                Intent displayHome = new Intent(LoginActivity.this, HomeActivity.class);
+                displayHome.putExtra("USER",fbUsername);
+                displayHome.putExtra("PASS",fbPassword);
+                mUsernameView.clearFocus();
+                mPasswordView.clearFocus();
+                startActivity(displayHome);
+
+            } else {
+                // Already Registered, log in using FB credentials
+                System.out.println("Already Registered");
+                mAuthTask = new UserLoginTask(fbUsername, fbPassword);
+                mAuthTask.execute((Void) null);
+
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            FBAuthTask = null;
+            showProgress(false);
+        }
     }
 
 //    private void populateAutoComplete() {
