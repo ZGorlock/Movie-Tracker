@@ -8,6 +8,7 @@ import { Login } from './components/login';
 import { Logout } from './components/logout';
 import { Signup } from './components/signup';
 import { Footer, Menu } from './components/navigation';
+import { Help } from './components/help'
 
 const App = () => (
   <div>
@@ -18,6 +19,7 @@ const App = () => (
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
       <Route path="/logout" component={Logout} />
+      <Route path="/help" component = {Help}/>
     </Switch>
     <Footer />
   </div>
