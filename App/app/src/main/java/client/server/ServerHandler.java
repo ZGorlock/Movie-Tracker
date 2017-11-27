@@ -7,7 +7,9 @@
 package client.server;
 
 import android.app.Application;
+import android.os.Environment;
 import android.util.Log;
+import android.content.*;
 
 import com.squareup.okhttp.MultipartBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -24,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyPair;
@@ -285,9 +288,9 @@ public class ServerHandler extends Application
      * @param mediaId The id of the Media to retrieve.
      * @return The Media that was retrieved, null if there was an error.
      */
-    public static Media retrieveMedia(int mediaId)
+    public static Media retrieveMedia(int mediaId, Context context)
     {
-        String response = mediaRetrieve(String.valueOf(mediaId));
+        String response = mediaRetrieve(String.valueOf(mediaId),context);
         if (response.isEmpty()) {
             return null;
         }
@@ -304,7 +307,7 @@ public class ServerHandler extends Application
             media.setDescription((String) json.get("description"));
             media.setGenre((String) json.get("genre"));
             media.setActors((String) json.get("actors"));
-            media.setImage(new File("images" + File.separator + json.get("image")));
+            media.setImage(new File((Environment.getExternalStorageDirectory()+"/poasters/"+json.get("image").toString())));
             media.setShowtimes((String) json.get("showtimes"));
             media.setRating((String) json.get("rating"));
             media.setYear(Integer.valueOf((String) json.get("year")));
@@ -713,7 +716,7 @@ public class ServerHandler extends Application
         }
     }
 
-    public static String mediaRetrieve(String mediaId)
+    public static String mediaRetrieve(String mediaId, Context context)
     {
         String url = BASE_URI + "retrieveMedia";
 
@@ -730,33 +733,43 @@ public class ServerHandler extends Application
             }
 
             //TODO images
-//            String imageName = response.header("image");
-//            if (imageName != null) {
-//
-//                File imageStore = new File("images" + File.separator + imageName);
-//                if (!imageStore.exists()) {
-//
+            String imageName = response.header("image");
+            if (imageName != null || !(imageName.equals(""))) {
+                File myDir = new File(Environment.getExternalStorageDirectory() + "/poasters/");
+                myDir.mkdirs();
+                File imageStore = new File(Environment.getExternalStorageDirectory() + "/poasters" + File.separator + imageName);
+                if (!imageStore.exists()) {
+
 //                    File dir = new File("images");
 //                    if (!dir.exists() || !dir.isDirectory()) {
+//                        System.out.println("Image response4:"+imageName);
+//
 //                        Files.createDirectory(Paths.get(dir.getAbsolutePath()));
 //                    }
+
 //                    Files.createFile(Paths.get(imageStore.getAbsolutePath()));
-//
-//                    String imageDump = response.header("imageDump");
-//                    if (imageDump != null && !imageDump.isEmpty()) {
-//                        byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
-//
-//                        try {
-//                            FileOutputStream fos = new FileOutputStream(imageStore);
-//                            fos.write(data);
-//                            fos.close();
-//
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                }
-//            }
+                    File file = new File(context.getFilesDir(), imageName);
+//                    System.out.println(file);
+                    String imageDump = response.header("imageDump");
+                    System.out.println("Image dump:" + imageDump);
+                    if (imageDump != null && !imageDump.isEmpty()) {
+
+                        byte[] data = Base64.getDecoder().decode(imageDump.getBytes());
+
+
+                        try {
+                            FileOutputStream fos = new FileOutputStream(imageStore);
+                            fos.write(data);
+                            fos.close();
+                            System.out.println(file);
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
 
             return response.header("mediaInfo");
 

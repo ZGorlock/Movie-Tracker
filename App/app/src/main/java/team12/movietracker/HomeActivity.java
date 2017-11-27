@@ -1,27 +1,18 @@
 package team12.movietracker;
 
 import android.app.AlarmManager;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.app.SearchableInfo;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.media.RingtoneManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,16 +21,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import client.pojo.Media;
-import client.pojo.User;
 import client.server.ServerHandler;
 
 //TODO: Setup Links to Help, Settings, and Suggestions
@@ -272,7 +259,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
             for(int i : mSubs)
             {
 
-                retrievedMedia = ServerHandler.retrieveMedia(i);
+                retrievedMedia = ServerHandler.retrieveMedia(i,HomeActivity.this);
                 try
                 {
                     System.out.println("Made it Try"+i);

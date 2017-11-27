@@ -1,6 +1,8 @@
 package team12.movietracker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,9 +43,19 @@ class DetailRecyclerViewAdapter extends RecyclerView.Adapter<DetailRecyclerViewA
         Integer subItem = mSubscriptions.get(position);
         //Picasso.with(mContext).load(subItem.getImage(subItem));
         System.out.println("Adapter "+subItem);
-        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position));
+        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position),mContext);
         holder.title.setText(retrievedMedia.getTitle());
         holder.showTime.setText(retrievedMedia.getShowtimes());
+        try{
+            String filePath = retrievedMedia.getImage().getPath();
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            holder.poster.setImageBitmap(bitmap);
+        }
+        catch(Exception e)
+        {
+            holder.poster.setImageResource(R.drawable.ic_dashboard_black_24dp);
+        }
+
 
 
     }

@@ -2,6 +2,8 @@ package team12.movietracker;
 
 
     import android.content.Context;
+    import android.graphics.Bitmap;
+    import android.graphics.BitmapFactory;
     import android.support.v7.widget.RecyclerView;
     import android.view.LayoutInflater;
     import android.view.View;
@@ -9,6 +11,14 @@ package team12.movietracker;
     import android.widget.ImageView;
     import android.widget.TextView;
 
+    import java.io.BufferedInputStream;
+    import java.io.BufferedReader;
+    import java.io.FileInputStream;
+    import java.io.FileNotFoundException;
+    import java.io.IOException;
+    import java.io.InputStream;
+    import java.io.InputStreamReader;
+    import java.util.Base64;
     import java.util.List;
 
     import client.pojo.Media;
@@ -44,9 +54,18 @@ class SearchRecyclerViewAdapter extends RecyclerView.Adapter<SearchRecyclerViewA
 //        Media queryMedia = new Media();
 //        queryMedia.setMediaId(subItem);
 //        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
-        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position));
+        Media retrievedMedia = ServerHandler.retrieveMedia(mSubscriptions.get(position),mContext);
         holder.title.setText(retrievedMedia.getTitle());
         holder.showTime.setText(retrievedMedia.getShowtimes());
+        try{
+            String filePath = retrievedMedia.getImage().getPath();
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            holder.poster.setImageBitmap(bitmap);
+        }
+        catch(Exception e)
+        {
+            holder.poster.setImageResource(R.drawable.ic_dashboard_black_24dp);
+        }
 
 
     }

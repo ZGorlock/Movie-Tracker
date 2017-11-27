@@ -1,5 +1,7 @@
 package team12.movietracker;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,7 +21,6 @@ import client.pojo.User;
 import client.server.ServerHandler;
 
 
-//TODO NEED TO FINISH THIS TO DISPLAY THE DETAILS OF THE FAVORITE SHOW/MOVIE or w.e
 public class ShowDetailActivity extends AppCompatActivity {
 
     private String mUsername;
@@ -64,7 +65,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
 //        ServerHandler.setupServerHandler();
         Media retrievedMedia = new Media();
-        retrievedMedia = ServerHandler.retrieveMedia(mMediaID);
+        retrievedMedia = ServerHandler.retrieveMedia(mMediaID,this);
         try{
             mTitle.setText(retrievedMedia.getTitle());
 
@@ -74,13 +75,15 @@ public class ShowDetailActivity extends AppCompatActivity {
             mTitle.setText("N/A");
 
         }
-//        try{
-//            //mImage
-//        }
-//        catch (Exception e)
-//        {
-//            //mImage
-//        }
+        try{
+            String filePath = retrievedMedia.getImage().getPath();
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            mImage.setImageBitmap(bitmap);
+        }
+        catch (Exception e)
+        {
+            mImage.setImageResource(R.drawable.ic_image_black_48dp);
+        }
 
         try{
             mDescription.setText(retrievedMedia.getDescription());

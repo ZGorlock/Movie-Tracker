@@ -1,156 +1,206 @@
 package team12.movietracker;
 
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.List;
+import java.util.Random;
+
+import client.pojo.Media;
 import client.pojo.User;
 import client.server.ServerHandler;
 
+
 public class SuggestionsActivity extends AppCompatActivity {
-
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
 
     private String mUsername;
     private String mPassword;
+    private Integer mMediaID;
+    private TextView mTitle;
+    private ImageView mImage;
+    private TextView mDescription;
+    private TextView mActor;
+    private TextView mGenre;
+    private TextView mShowTimes;
+    private TextView mRating;
+    private TextView mYear;
+    private Button mFavoriteAddRemove;
+    private Button mRandomButton;
+    private boolean FavoriteAdd;
+
+    private Random randomGenerator = new Random();
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_suggestions);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mUsername = getIntent().getStringExtra("USER");
         mPassword = getIntent().getStringExtra("PASS");
         User user = ServerHandler.validateUser(mUsername, mPassword);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        String token = ServerHandler.authorizeUser(mUsername, mPassword);
 
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mTitle = (TextView) findViewById(R.id.textViewTitle);
+        mImage = (ImageView) findViewById(R.id.imageViewPoster);
+        mDescription = (TextView) findViewById(R.id.textViewDescription);
+        mActor = (TextView) findViewById(R.id.textViewActors);
+        mGenre = (TextView) findViewById(R.id.textViewGenre);
+        mShowTimes = (TextView) findViewById(R.id.textViewShowTimes);
+        mRating = (TextView) findViewById(R.id.textViewRating);
+        mYear = (TextView) findViewById(R.id.textViewYear);
+        List<Integer> subscriptions = ServerHandler.getSubscriptions();
+        Media queryMedia = new Media();
+        queryMedia.setTitle("");
+        List<Integer> currentMedia = ServerHandler.queryMedia(queryMedia);
+        boolean foundValue = true;
+        int index = 0;
+        while(foundValue)
+        {
+            index = randomGenerator.nextInt(currentMedia.size());
+            if(!subscriptions.contains(currentMedia.get(index)))
+            {
+                foundValue = false;
+            }
+        }
+
+
+
+//        ServerHandler.setupServerHandler();
+        Media retrievedMedia = new Media();
+        retrievedMedia = ServerHandler.retrieveMedia(currentMedia.get(index),this);
+        try{
+            mTitle.setText(retrievedMedia.getTitle());
+
+        }
+        catch (Exception e)
+        {
+            mTitle.setText("N/A");
+
+        }
+        try{
+            String filePath = retrievedMedia.getImage().getPath();
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+            mImage.setImageBitmap(bitmap);
+
+        }
+        catch (Exception e)
+        {
+            mImage.setImageResource(R.drawable.ic_image_black_48dp);
+        }
+
+        try{
+            mDescription.setText(retrievedMedia.getDescription());
+
+        }
+        catch (Exception e)
+        {
+            mDescription.setText("N/A");
+
+        }
+        try{
+            mActor.setText(retrievedMedia.getActors());
+
+        }
+        catch (Exception e)
+        {
+            mActor.setText("N/A");
+
+        }
+        try{
+            mGenre.setText(retrievedMedia.getGenre());
+
+        }
+        catch (Exception e)
+        {
+            mGenre.setText("N/A");
+
+        }
+        try{
+            mShowTimes.setText(retrievedMedia.getShowtimes());
+
+        }
+        catch (Exception e)
+        {
+            mShowTimes.setText("N/A");
+
+        }
+        try{
+            mRating.setText(retrievedMedia.getRating());
+
+        }
+        catch (Exception e)
+        {
+            mRating.setText("N/A");
+
+        }
+        try{
+            mYear.setText(retrievedMedia.getYear());
+
+        }
+        catch (Exception e)
+        {
+            mYear.setText("N/A");
+
+        }
+
+
+        mFavoriteAddRemove = (Button) findViewById(R.id.buttonAddDeleteFav);
+        mRandomButton = (Button) findViewById(R.id.buttonRandom);
+
+
+        if(!subscriptions.contains(mMediaID))
+        {
+            mFavoriteAddRemove.setText(R.string.favorite_add);
+            FavoriteAdd = true;
+        }
+        else
+        {
+            mFavoriteAddRemove.setText(R.string.favorite_remove);
+            FavoriteAdd = false;
+        }
+
+        mFavoriteAddRemove.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onClick(View v) {
+                if(FavoriteAdd)
+                {
+                    ServerHandler.addSubscription(mMediaID);
+                    mFavoriteAddRemove.setText(R.string.favorite_remove);
+                    FavoriteAdd = false;
+
+                }
+                else
+                {
+                    ServerHandler.removeSubscription(mMediaID);
+                    mFavoriteAddRemove.setText(R.string.favorite_add);
+                    FavoriteAdd = true;
+
+                }
+            }
+        });
+        mRandomButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+                startActivity(getIntent());
             }
         });
 
-    }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_suggestions, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_suggestions, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
-        }
-
-        @Override
-        public int getCount() {
-            // Show 3 total pages.
-            return 3;
-        }
     }
 }
