@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import client.Test;
@@ -172,7 +173,8 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
 
     private void initFacebook() {
         FBLoginButton = findViewById(R.id.FBlogin_button);
-        // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+       // LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+
         callbackManager = CallbackManager.Factory.create();
         // Register Callback
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
@@ -191,9 +193,15 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
                                     String FBEmail = object.getString("email");
                                     String Firstname= object.getString("first_name");
                                     String Lastname = object.getString("last_name");
+                                    if(FBEmail!=null){
+                                        Log.v("Email = ", " " + FBEmail);
+                                    }else{
+                                        Log.v("email","is empty");
+                                        FBEmail = "defultfacebookemail@fakeemail.com";
+                                        Log.v("Email = ", " " + FBEmail);
+                                    }
                                     // Print out info
                                     Log.v("id = ", " " + FBid);
-                                    Log.v("Email = ", " " + FBEmail);
                                     Log.v("First Name = ", " " + Firstname);
                                     Log.v("First Name = ", " " + Lastname);
                                     // Use data to Register and login
