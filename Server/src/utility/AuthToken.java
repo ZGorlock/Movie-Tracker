@@ -236,10 +236,10 @@ public final class AuthToken
     public static Response validateAuthTokenForPost(String authToken, long commId)
     {
         //validate communication channel
-        if (!CommunicationHandler.hasCommunicationId(commId)) {
-            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
-            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel was never opened").build();
-        }
+//        if (!CommunicationHandler.hasCommunicationId(commId)) {
+//            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
+//            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel was never opened").build();
+//        }
         
         //decrypt auth token
         String decryptedAuthToken = CommunicationHandler.decryptCommunication(commId, authToken);
@@ -275,10 +275,10 @@ public final class AuthToken
     public static Response validateAuthToken(String authToken, long commId)
     {
         //validate communication channel
-        if (!CommunicationHandler.hasCommunicationId(commId)) {
-            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
-            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel was never opened").build();
-        }
+//        if (!CommunicationHandler.hasCommunicationId(commId)) {
+//            logger.warn("POST failed: Communication channel at: {} was never opened", commId);
+//            return Response.status(Status.UNAUTHORIZED).header("message", "Failure: The specified communication channel was never opened").build();
+//        }
         
         //decrypt auth token
         String decryptedAuthToken = CommunicationHandler.decryptCommunication(commId, authToken);

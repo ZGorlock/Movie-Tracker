@@ -6,7 +6,6 @@
 
 package communication;
 
-import client.server.ClientCommunicationHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.CryptoUtility;
@@ -28,7 +27,7 @@ public final class CommunicationHandler
     /**
      * The logger.
      */
-    private static final Logger logger = LoggerFactory.getLogger(ClientCommunicationHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommunicationHandler.class);
 
 
     //Enums
@@ -53,7 +52,7 @@ public final class CommunicationHandler
     /**
      * A map of communication channel ids to their associated AES secret key, client RSA public key, and client DSA public key.
      */
-    private final static Map<Long, List<Key>> communicationKeys = new HashMap<>();
+//    private final static Map<Long, List<Key>> communicationKeys = new HashMap<>();
     
     
     //Functions
@@ -69,24 +68,26 @@ public final class CommunicationHandler
      */
     public static long openCommunicationChannel(PublicKey rsaPublicKey, PublicKey dsaPublicKey, KeyPair rsaServerKeys, KeyPair dsaServerKeys)
     {
-        if ((rsaPublicKey == null) || (dsaPublicKey == null) || (rsaServerKeys == null) || (dsaServerKeys == null)) {
-            return -1;
-        }
+        return -1;
         
-        long id = generateCommunicationId();
-        SecretKey aesKey = CryptoUtility.generateAESKey();
-        
-        List<Key> keys = new ArrayList<>();
-        keys.add(aesKey);
-        keys.add(rsaPublicKey);
-        keys.add(dsaPublicKey);
-        keys.add(rsaServerKeys.getPublic());
-        keys.add(rsaServerKeys.getPrivate());
-        keys.add(dsaServerKeys.getPublic());
-        keys.add(dsaServerKeys.getPrivate());
-        
-        communicationKeys.put(id, keys);
-        return id;
+//        if ((rsaPublicKey == null) || (dsaPublicKey == null) || (rsaServerKeys == null) || (dsaServerKeys == null)) {
+//            return -1;
+//        }
+//
+//        long id = generateCommunicationId();
+//        SecretKey aesKey = CryptoUtility.generateAESKey();
+//
+//        List<Key> keys = new ArrayList<>();
+//        keys.add(aesKey);
+//        keys.add(rsaPublicKey);
+//        keys.add(dsaPublicKey);
+//        keys.add(rsaServerKeys.getPublic());
+//        keys.add(rsaServerKeys.getPrivate());
+//        keys.add(dsaServerKeys.getPublic());
+//        keys.add(dsaServerKeys.getPrivate());
+//
+//        communicationKeys.put(id, keys);
+//        return id;
     }
     
     /**
@@ -97,10 +98,12 @@ public final class CommunicationHandler
     @SuppressWarnings("StatementWithEmptyBody")
     private static long generateCommunicationId()
     {
-        long id;
-        while (communicationKeys.containsKey((id = (long) ((new SecureRandom().nextDouble() * Long.MAX_VALUE) + 1)))) {
-        }
-        return id;
+        return -1;
+        
+//        long id;
+//        while (communicationKeys.containsKey((id = (long) ((new SecureRandom().nextDouble() * Long.MAX_VALUE) + 1)))) {
+//        }
+//        return id;
     }
     
     /**
@@ -111,7 +114,8 @@ public final class CommunicationHandler
      */
     public static boolean hasCommunicationId(long id)
     {
-        return communicationKeys.containsKey(id);
+        return true;
+//        return communicationKeys.containsKey(id);
     }
     
     /**
@@ -122,24 +126,26 @@ public final class CommunicationHandler
      */
     public static List<String> getCommunicationChannelKeys(long id)
     {
-        if (!communicationKeys.containsKey(id)) {
-            return null;
-        }
+        return new ArrayList<String>(4);
         
-        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
-        PublicKey rsaKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.RSA_CLIENT_PUBLIC_KEY.ordinal());
-        PublicKey rsaServerKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.RSA_SERVER_PUBLIC_KEY.ordinal());
-        PublicKey dsaServerKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.DSA_SERVER_PUBLIC_KEY.ordinal());
-        if ((aesKey == null) || (rsaKey == null) || (rsaServerKey == null) || (dsaServerKey == null)) {
-            return null;
-        }
-        
-        List<String> keyStores = new ArrayList<>();
-        keyStores.add(CryptoUtility.encryptRSA(CryptoUtility.storeAESSecret(aesKey), rsaKey));
-        keyStores.add(CryptoUtility.storeRSAPublicKey(rsaServerKey));
-        keyStores.add(CryptoUtility.storeDSAPublicKey(dsaServerKey));
-        
-        return keyStores;
+//        if (!communicationKeys.containsKey(id)) {
+//            return null;
+//        }
+//
+//        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
+//        PublicKey rsaKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.RSA_CLIENT_PUBLIC_KEY.ordinal());
+//        PublicKey rsaServerKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.RSA_SERVER_PUBLIC_KEY.ordinal());
+//        PublicKey dsaServerKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.DSA_SERVER_PUBLIC_KEY.ordinal());
+//        if ((aesKey == null) || (rsaKey == null) || (rsaServerKey == null) || (dsaServerKey == null)) {
+//            return null;
+//        }
+//
+//        List<String> keyStores = new ArrayList<>();
+//        keyStores.add(CryptoUtility.encryptRSA(CryptoUtility.storeAESSecret(aesKey), rsaKey));
+//        keyStores.add(CryptoUtility.storeRSAPublicKey(rsaServerKey));
+//        keyStores.add(CryptoUtility.storeDSAPublicKey(dsaServerKey));
+//
+//        return keyStores;
     }
     
     /**
@@ -151,12 +157,12 @@ public final class CommunicationHandler
      */
     public static String encryptCommunication(long id, String message)
     {
-        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
-        if (aesKey == null) {
-            return "";
-        }
+//        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
+//        if (aesKey == null) {
+//            return "";
+//        }
         
-        return CryptoUtility.encryptAES(message, aesKey);
+        return CryptoUtility.encryptAES(message, null);
     }
     
     /**
@@ -168,12 +174,12 @@ public final class CommunicationHandler
      */
     public static String decryptCommunication(long id, String message)
     {
-        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
-        if (aesKey == null) {
-            return "";
-        }
+//        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
+//        if (aesKey == null) {
+//            return "";
+//        }
         
-        return CryptoUtility.decryptAES(message, aesKey);
+        return CryptoUtility.decryptAES(message, null);
     }
     
     /**
@@ -185,12 +191,12 @@ public final class CommunicationHandler
      */
     public static String signCommunication(long id, String message)
     {
-        PrivateKey dsaServerPrivateKey = (PrivateKey) communicationKeys.get(id).get(KeyIndex.DSA_SERVER_PRIVATE_KEY.ordinal());
-        if (dsaServerPrivateKey == null) {
-            return "";
-        }
+//        PrivateKey dsaServerPrivateKey = (PrivateKey) communicationKeys.get(id).get(KeyIndex.DSA_SERVER_PRIVATE_KEY.ordinal());
+//        if (dsaServerPrivateKey == null) {
+//            return "";
+//        }
         
-        return CryptoUtility.signDSA(message, dsaServerPrivateKey);
+        return CryptoUtility.signDSA(message, null);
     }
     
     /**
@@ -203,8 +209,10 @@ public final class CommunicationHandler
      */
     public static boolean verifyCommunication(long id, String message, String signature)
     {
-        PublicKey dsaClientPublicKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.DSA_CLIENT_PUBLIC_KEY.ordinal());
-        return (dsaClientPublicKey != null) && CryptoUtility.verifyDSA(message, signature, dsaClientPublicKey);
+        return true;
+        
+//        PublicKey dsaClientPublicKey = (PublicKey) communicationKeys.get(id).get(KeyIndex.DSA_CLIENT_PUBLIC_KEY.ordinal());
+//        return (dsaClientPublicKey != null) && CryptoUtility.verifyDSA(message, signature, dsaClientPublicKey);
     }
     
     /**
@@ -216,11 +224,13 @@ public final class CommunicationHandler
      */
     public static boolean closeCommunicationChannel(long id, SecretKey aesKey)
     {
-        if (communicationKeys.containsKey(id) && CryptoUtility.storeAESSecret((SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal())).equals(CryptoUtility.storeAESSecret(aesKey))) {
-            communicationKeys.remove(id);
-            return true;
-        }
-        return false;
+        return true;
+        
+//        if (communicationKeys.containsKey(id) && CryptoUtility.storeAESSecret((SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal())).equals(CryptoUtility.storeAESSecret(aesKey))) {
+//            communicationKeys.remove(id);
+//            return true;
+//        }
+//        return false;
     }
     
 }

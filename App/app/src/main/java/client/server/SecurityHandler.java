@@ -59,7 +59,8 @@ public class SecurityHandler
      */
     public static String encryptMessage(String message, PublicKey publicKey)
     {
-        return CryptoUtility.encryptRSA(message, publicKey);
+        return message;
+//        return CryptoUtility.encryptRSA(message, publicKey);
     }
     
     /**
@@ -71,7 +72,8 @@ public class SecurityHandler
      */
     public static String encryptMessageWithPassword(String message, String salt)
     {
-        return CryptoUtility.encryptWithPassword(message, password + salt);
+        return message;
+//        return CryptoUtility.encryptWithPassword(message, password + salt);
     }
     
     /**
@@ -82,7 +84,8 @@ public class SecurityHandler
      */
     public static String decryptMessage(String message)
     {
-        return CryptoUtility.decryptRSA(message, rsaKeys.getPrivate());
+        return message;
+//        return CryptoUtility.decryptRSA(message, rsaKeys.getPrivate());
     }
     
     /**
@@ -94,7 +97,8 @@ public class SecurityHandler
      */
     public static String decryptMessageWithPassword(String message, String salt)
     {
-        return CryptoUtility.decryptWithPassword(message, password + salt);
+        return message;
+//        return CryptoUtility.decryptWithPassword(message, password + salt);
     }
     
     /**
@@ -105,7 +109,8 @@ public class SecurityHandler
      */
     public static String signMessage(String message)
     {
-        return CryptoUtility.signDSA(message, dsaKeys.getPrivate());
+        return message;
+//        return CryptoUtility.signDSA(message, dsaKeys.getPrivate());
     }
     
     /**
@@ -118,6 +123,7 @@ public class SecurityHandler
      */
     public static boolean verifyMessage(String message, String signature, PublicKey publicKey)
     {
-        return CryptoUtility.verifyDSA(message, signature, publicKey);
+        return true;
+//        return CryptoUtility.verifyDSA(message, signature, publicKey);
     }
 }

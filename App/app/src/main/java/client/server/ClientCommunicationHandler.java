@@ -113,15 +113,13 @@ public final class ClientCommunicationHandler
      */
     public static String encryptCommunication(long id, String message)
     {
+//        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
+//        if (aesKey == null) {
+//
+//            return "";
+//        }
 
-        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
-        if (aesKey == null) {
-
-            return "";
-        }
-
-        return CryptoUtility.encryptAES(message, aesKey);
-//        return message;
+        return CryptoUtility.encryptAES(message, null);
     }
     
     /**
@@ -133,12 +131,12 @@ public final class ClientCommunicationHandler
      */
     public static String decryptCommunication(long id, String message)
     {
-        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
-        if (aesKey == null) {
-            return "";
-        }
+//        SecretKey aesKey = (SecretKey) communicationKeys.get(id).get(KeyIndex.AES_KEY.ordinal());
+//        if (aesKey == null) {
+//            return "";
+//        }
         
-        return CryptoUtility.decryptAES(message, aesKey);
+        return CryptoUtility.decryptAES(message, null);
     }
     
     /**

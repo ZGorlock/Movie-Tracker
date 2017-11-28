@@ -115,8 +115,8 @@ public class ServerHandler extends Application
         client = new OkHttpClient();
     
         //generate the unique keys for the client
-        generateKeys();
-        openCommunicationChannel();
+//        generateKeys();
+//        openCommunicationChannel();
     }
     
     /**
@@ -136,7 +136,7 @@ public class ServerHandler extends Application
     public static void shutdownServerHandler()
     {
         //close the client connection
-        closeCommunicationChannel(serverCommId);
+//        closeCommunicationChannel(serverCommId);
     }
     
     /**
