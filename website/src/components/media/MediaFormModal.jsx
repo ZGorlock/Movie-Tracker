@@ -21,6 +21,31 @@ const genreOptions = [
     value: 'action',
     text: 'Action',
   },
+    {
+    key: 'adventure',
+    value: 'adventure',
+    text: 'Adventure',
+  },
+  {
+    key: 'comedy',
+    value: 'comedy',
+    text: 'Comedy',
+  },
+  {
+    key: 'romance',
+    value: 'romance',
+    text: 'Romance',
+  },
+  {
+    key: 'sci-fi',
+    value: 'sci-fi',
+    text: 'Sci-fi',
+  },
+  {
+    key: 'thriller',
+    value: 'thriller',
+    text: 'Thiller',
+  },
   {
     key: 'horror',
     value: 'horror',
