@@ -70,14 +70,40 @@ public class Test
         //description <= 2048 characters
 
         Media media1 = new Media();
-        media1.setTitle("DuringDayNoneTest");
+        media1.setTitle("Notification 7");
         media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
         //media1.setProducerId(); no need to set this, the server takes care of it
         media1.setDescription("This is the TV Show.");
         media1.setGenre("Drama");
         media1.setActors("Lionard Deprapio; Jecca Simons; Kristofar Wakin;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
         media1.setImage(new File("resources/unnamed.png"));
-        media1.setShowtimes("Nov 25, 2017 1:00 PM;"); //same with the format and delimination of these
+        media1.setShowtimes("Nov 29, 2017 3:30 AM;"); //same with the format and delimination of these
+        media1.setRating("R");
+        media1.setYear(2017);
+
+        ServerHandler.addMedia(media1);
+
+        media1.setTitle("Notification 10");
+        media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
+        //media1.setProducerId(); no need to set this, the server takes care of it
+        media1.setDescription("This is the TV Show.");
+        media1.setGenre("Drama");
+        media1.setActors("Lionard Deprapio; Jecca Simons; Kristofar Wakin;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+        media1.setImage(new File("resources/unnamed.png"));
+        media1.setShowtimes("Nov 29, 2017 3:52 AM;"); //same with the format and delimination of these
+        media1.setRating("R");
+        media1.setYear(2017);
+
+        ServerHandler.addMedia(media1);
+
+        media1.setTitle("Notification 11");
+        media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
+        //media1.setProducerId(); no need to set this, the server takes care of it
+        media1.setDescription("This is the TV Show.");
+        media1.setGenre("Drama");
+        media1.setActors("Lionard Deprapio; Jecca Simons; Kristofar Wakin;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+        media1.setImage(new File("resources/unnamed.png"));
+        media1.setShowtimes("Nov 29, 2017 3:58 AM;"); //same with the format and delimination of these
         media1.setRating("R");
         media1.setYear(2017);
 

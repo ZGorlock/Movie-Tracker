@@ -153,10 +153,10 @@ public class MyReceiver extends BroadcastReceiver {
 
         SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(context);
         String output = SP.getString("list_preference_1","0");
-        String title = "Movie Time!";
-        String body = output + " until your movie";
+        String title = "Show Time!";
+        String body = output + " minutes until your show";
 
-        if(output.toUpperCase().equals( "NONE"))
+        if(((output.toUpperCase()).substring(0,1)).equals("0"))
         {
             body = "Your movie is starting now!";
         }

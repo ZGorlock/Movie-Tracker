@@ -171,8 +171,221 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
-        mNotifications = new startNotifications(subscriptions1);
-        mNotifications.execute();
+//        mNotifications = new startNotifications(subscriptions1);
+//        mNotifications.execute();
+
+
+        SharedPreferences SP = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean notificationONOFF = SP.getBoolean("notifications_new_message", false);
+        String output = SP.getString("list_preference_1","0");
+        output = output.toUpperCase();
+        System.out.println("Made it1");
+        if(output.contains("MINUTES"))
+        {
+            output = output.replace(" MINUTES","");
+        }
+        else if(output.contains("NONE"))
+        {
+            output = output.replace("NONE","0");
+        }
+        int delayValue = Integer.parseInt(output);
+        System.out.println("Made it2");
+
+        System.out.println("Made it3");
+
+
+        ArrayList<PendingIntent> intentArray = new ArrayList<PendingIntent>();
+        Media retrievedMedia = new Media();
+        String tempShowTime;
+        String tempShowArray[];
+        String tempDividedArray[];
+        String tempMonth;
+        String tempTime[];
+        String tempJ;
+        int month;
+        int day;
+        int year;
+        int hour;
+        int minute;
+        int alarmNumber = 0;
+        boolean AM;
+        for(int i : subscriptions1)
+        {
+
+            retrievedMedia = ServerHandler.retrieveMedia(i,HomeActivity.this);
+            try
+            {
+                System.out.println("Made it Try"+i);
+                tempShowTime = retrievedMedia.getShowtimes();
+                System.out.println(tempShowTime);
+                tempShowArray = tempShowTime.split(";");
+                for(String j:tempShowArray)
+                {
+                    tempJ = j.trim();
+                    tempDividedArray = tempJ.split(" ");
+                    System.out.println(j);
+                        /*
+                        Nov 17, 2017 11:00 PM
+                        tempDividedArray[0] = Month
+                        tempDividedArray[1] = Day
+                        tempDividedArray[2] = Year
+                        tempDividedArray[3] = Time
+                        tempDividedArray[4] = AM/PM
+                         */
+                    tempMonth = tempDividedArray[0].toUpperCase();
+                    System.out.println(tempDividedArray[0]);
+                    System.out.println(tempDividedArray[1]);
+                    System.out.println(tempDividedArray[2]);
+                    System.out.println(tempDividedArray[3]);
+                    System.out.println(tempDividedArray[4]);
+
+                    switch(tempMonth) {
+                        case "JAN":
+                            month = 0;
+                            break;
+                        case "FEB":
+                            month = 1;
+                            break;
+                        case "MAR":
+                            month = 2;
+                            break;
+                        case "APR":
+                            month = 3;
+                            break;
+                        case "MAY":
+                            month = 4;
+                            break;
+                        case "JUN":
+                            month = 5;
+                            break;
+                        case "JUL":
+                            month = 6;
+                            break;
+                        case "AUG":
+                            month = 7;
+                            break;
+                        case "SEP":
+                            month = 8;
+                            break;
+                        case "OCT":
+                            month = 9;
+                            break;
+                        case "NOV":
+                            month = 10;
+                            break;
+                        case "DEC":
+                            month = 11;
+                            break;
+                        default:
+                            month = 0;
+                            break;
+                    }
+                    tempDividedArray[1] = tempDividedArray[1].replace(",","");
+                    day = Integer.parseInt(tempDividedArray[1]);
+                    year = Integer.parseInt(tempDividedArray[2]);
+                    tempTime = tempDividedArray[3].split(":");
+                    hour = Integer.parseInt(tempTime[0]);
+                    minute = Integer.parseInt(tempTime[1]);
+
+                    Calendar calendar3 = Calendar.getInstance();
+                    calendar3.set(Calendar.MONTH, month);
+                    calendar3.set(Calendar.DATE, day);
+                    calendar3.set(Calendar.YEAR, year);
+                    calendar3.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar3.set(Calendar.MINUTE, minute);
+                    calendar3.set(Calendar.SECOND, 1);
+
+                    minute = minute - delayValue;
+                    if(minute < 0)
+                    {
+                        hour = hour -1;
+                        minute = minute + 60;
+                    }
+
+
+                    if(tempDividedArray[4].contains("AM"))
+                    {
+                        AM = true;
+                        if(hour == 12)
+                        {
+                            hour += 12;
+                        }
+
+                    }
+                    else
+                    {
+                        AM = false;
+                        if(hour != 12)
+                        {
+                            hour = hour + 12;
+
+                        }
+                    }
+
+
+
+
+                    Intent notifyIntent = new Intent(HomeActivity.this,MyReceiver.class);
+//                        if()
+//                        notifyIntent.putExtra("DELAY", )
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.MONTH, month);
+                    calendar.set(Calendar.DATE, day);
+                    calendar.set(Calendar.YEAR, year);
+                    calendar.set(Calendar.HOUR_OF_DAY, hour);
+                    calendar.set(Calendar.MINUTE, minute);
+                    calendar.set(Calendar.SECOND, 1);
+
+
+//                        calendar.set(Calendar.MONTH, 10);
+//                        calendar.set(Calendar.DATE, 25);
+//                        calendar.set(Calendar.YEAR, 2017);
+//                        calendar.set(Calendar.HOUR_OF_DAY, 11);
+//                        calendar.set(Calendar.MINUTE, 52);
+//                        calendar.set(Calendar.SECOND, 1);
+
+                    Calendar cal2 = Calendar.getInstance();
+                    System.out.println("Alarm set to "+calendar.getTimeInMillis() + " current time is: "+cal2.getTimeInMillis());
+                    AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+                    if(cal2.getTimeInMillis()<=calendar.getTimeInMillis())
+                    {
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(getApplicationContext(), alarmNumber, notifyIntent, 0);
+                        manager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
+                        alarmNumber++;
+                        intentArray.add(pendingIntent);
+                    }
+                    if(cal2.getTimeInMillis()>calendar3.getTimeInMillis())
+                    {
+                        if(tempShowArray[tempShowArray.length-1].equals(j))
+                        {
+                            ServerHandler.removeSubscription(i);
+
+                        }
+                    }
+
+
+
+                    if(!notificationONOFF)
+                    {
+                        for(PendingIntent k: intentArray)
+                        {
+                            manager.cancel(k);
+                        }
+                    }
+                }
+
+
+
+            }
+            catch (NullPointerException e)
+            {
+                System.out.println("Made it catch"+i);
+                Log.d("HomeActivityStartNotification", "Unable to get ShowTimes:" + e);
+            }
+
+        }
 
 
     }
@@ -463,6 +676,7 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
 //            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //            StrictMode.setThreadPolicy(policy);
             mDetailRecyclerViewAdapter.loadNewData(mSubs);
+
 
             return true;
         }
