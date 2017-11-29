@@ -165,7 +165,9 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
 
         mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(this, new ArrayList<Integer>());
         recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
+        mdHBTask = new displayHomeBrowse(subscriptions1);
+        mdHBTask.execute();
+//        mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
 
@@ -450,46 +452,23 @@ public class HomeActivity extends AppCompatActivity implements RecyclerItemClick
     public class displayHomeBrowse extends AsyncTask<Void, Void, Boolean> {
 
 
-        public displayHomeBrowse()
+        private List<Integer> mSubs;
+        public displayHomeBrowse(List<Integer> subs)
         {
-
+            mSubs = subs;
         }
 
         @Override
         protected Boolean doInBackground(Void... voids) {
 //            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 //            StrictMode.setThreadPolicy(policy);
-            System.out.println("Here");
-
-            ServerHandler.setupServerHandler();
-            System.out.println("Here");
-            String token = ServerHandler.authorizeUser(mUsername, mPassword);
-            System.out.println("Here");
-            List<Integer> subscriptions1 = ServerHandler.getSubscriptions();
-            System.out.println("Here");
-            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            System.out.println("Here");
-
-            recyclerView.setLayoutManager(new LinearLayoutManager(HomeActivity.this));
-            System.out.println("Here");
-
-
-            mDetailRecyclerViewAdapter = new DetailRecyclerViewAdapter(HomeActivity.this, new ArrayList<Integer>());
-            System.out.println("Here");
-
-            recyclerView.setAdapter(mDetailRecyclerViewAdapter);
-            System.out.println("Here");
-
-            mDetailRecyclerViewAdapter.loadNewData(subscriptions1);
-            System.out.println("Here");
-
-
-            recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(HomeActivity.this, recyclerView, HomeActivity.this));
-            System.out.println("Here");
+            mDetailRecyclerViewAdapter.loadNewData(mSubs);
 
             return true;
         }
     }
+
+
 
 
 

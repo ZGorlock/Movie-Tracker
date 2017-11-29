@@ -190,7 +190,7 @@ public class LoginActivity extends AppCompatActivity{//} implements LoaderCallba
                                 Log.v("LoginActivity", response.toString());
                                 try {
                                     String FBid = object.getString("id");
-                                    String FBEmail = object.getString("email");
+                                    String FBEmail = "facebooklogin@gmail.com";
                                     String Firstname= object.getString("first_name");
                                     String Lastname = object.getString("last_name");
                                     if(FBEmail!=null){

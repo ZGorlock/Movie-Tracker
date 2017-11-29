@@ -2,6 +2,7 @@ package team12.movietracker;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -25,6 +26,8 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
     private String mUsername;
     private String mPassword;
     private SearchRecyclerViewAdapter mSearchRecyclerViewAdapter;
+    private displaySearchResultsBrowse mdSRBTask = null;
+
 
 
 
@@ -80,7 +83,9 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
 
         mSearchRecyclerViewAdapter = new SearchRecyclerViewAdapter(this, new ArrayList<Integer>());
         recyclerView.setAdapter(mSearchRecyclerViewAdapter);
-        mSearchRecyclerViewAdapter.loadNewData(currentMedia);
+        mdSRBTask = new displaySearchResultsBrowse(currentMedia);
+        mdSRBTask.execute();
+//        mSearchRecyclerViewAdapter.loadNewData(currentMedia);
 
         recyclerView.addOnItemTouchListener(new RecyclerItemClickListener(this, recyclerView, this));
     }
@@ -102,5 +107,23 @@ public class SearchResultsActivity extends HomeActivity implements RecyclerItemC
 //        intent.putExtra("MEDIAID",mSearchRecyclerViewAdapter.getSub(position));
 //        startActivity(intent);
 
+    }
+
+    public class displaySearchResultsBrowse extends AsyncTask<Void, Void, Boolean> {
+
+        private List<Integer> mSubs;
+        public displaySearchResultsBrowse(List<Integer> subs)
+        {
+            mSubs = subs;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... voids) {
+//            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+//            StrictMode.setThreadPolicy(policy);
+            mSearchRecyclerViewAdapter.loadNewData(mSubs);
+
+            return true;
+        }
     }
 }

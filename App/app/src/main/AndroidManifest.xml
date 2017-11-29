@@ -33,7 +33,7 @@
         </activity>
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
+            android:label="Home"
             android:launchMode="singleTop"/>
         <activity
             android:name=".RegisterActivity"
@@ -54,7 +54,7 @@
         </activity>
         <activity
             android:name=".SearchResultsActivity"
-            android:label="@string/title_activity_search_results"
+            android:label=""
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -63,7 +63,7 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
+            android:label="Settings"
             android:parentActivityName=".HomeActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -71,7 +71,7 @@
         </activity>
         <activity
             android:name=".HelpActivity"
-            android:label="@string/title_activity_help"
+            android:label=""
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -80,7 +80,7 @@
         </activity>
         <activity
             android:name=".SuggestionsActivity"
-            android:label="@string/title_activity_suggestions"
+            android:label=""
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -89,7 +89,7 @@
         </activity>
         <activity
             android:name=".FavoritesActivity"
-            android:label="@string/title_activity_favorites"
+            android:label=""
             android:parentActivityName=".HomeActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -98,7 +98,7 @@
         </activity>
         <activity
             android:name=".ShowDetailActivity"
-            android:label="@string/title_activity_show_detail"
+            android:label=""
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
