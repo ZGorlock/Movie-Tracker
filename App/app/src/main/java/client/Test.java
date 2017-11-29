@@ -70,44 +70,71 @@ public class Test
         //description <= 2048 characters
 
         Media media1 = new Media();
-        media1.setTitle("Coco");
+
+        media1.setTitle("The LEGO Ninjago Movie");
         media1.setType("Movie"); //you can make the types whatever you want as long as they are consistent
         //media1.setProducerId(); no need to set this, the server takes care of it
-        media1.setDescription("Aspiring musician Miguel, confronted with his family's ancestral ban on music, enters the Land of the Dead to work out the mystery.");
+        media1.setDescription("Shunned by everyone for being the son of an evil warlord, a teenager seeks to defeat him with the help of his fellow ninjas.");
         media1.setGenre("Adventure");
-        media1.setActors("Lee Unkrich; Adrian Molina;  Anthony Gonzalez; Gael García Bernal; Benjamin Bratt;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
-        media1.setImage(new File("resources/Coco_poster.png"));
+        media1.setActors("Charlie Bean; Paul Fisher; Bob Logan; Jackie Chan; Dave Franco; Fred Armisen; Kumail Nanjiani;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+        media1.setImage(new File("resources/Ninjago_Movie.png"));
         media1.setShowtimes("Dec 2, 2017 11:00 AM;"); //same with the format and delimination of these
         media1.setRating("PG");
         media1.setYear(2017);
 
         ServerHandler.addMedia(media1);
 
-        media1.setTitle("Planet Earth II");
+
+        media1.setTitle("The Punisher");
         media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
         //media1.setProducerId(); no need to set this, the server takes care of it
-        media1.setDescription("David Attenborough returns in this breathtaking documentary showcasing life on Planet Earth.");
-        media1.setGenre("Drama");
-        media1.setActors("David Attenborough;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
-        media1.setImage(new File("resources/Planet_Earth_II.png"));
-        media1.setShowtimes("Dec 7, 2017 7:00 AM;"); //same with the format and delimination of these
-        media1.setRating("G");
-        media1.setYear(2016);
-
-        ServerHandler.addMedia(media1);
-
-        media1.setTitle("Star Wars: The Last Jedi");
-        media1.setType("Movie"); //you can make the types whatever you want as long as they are consistent
-        //media1.setProducerId(); no need to set this, the server takes care of it
-        media1.setDescription("Having taken her first steps into the Jedi world, Rey joins Luke Skywalker on an adventure with Leia, Finn and Poe that unlocks mysteries of the Force and secrets of the past. ");
+        media1.setDescription("After the murder of his family, Marine veteran Frank Castle became a vigilante known as \"The Punisher\" with only one goal in mind, to avenge them. ");
         media1.setGenre("Action");
-        media1.setActors("Rian Johnson; George Lucas; Daisy Ridley; John Boyega; Mark Hamill;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
-        media1.setImage(new File("resources/Star_Wars_Episode_VIII_The_Last_Jedi.png"));
-        media1.setShowtimes("Dec 15, 2017 12:00 AM;"); //same with the format and delimination of these
-        media1.setRating("PG-13");
+        media1.setActors("Tom Shankland; Jon Bernthal; Ebon Moss-Bachrach; Amber Rose Revah;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+        media1.setImage(new File("resources/Punisher.png"));
+        media1.setShowtimes("Dec 2, 2017 11:00 AM;"); //same with the format and delimination of these
+        media1.setRating("R");
         media1.setYear(2017);
 
         ServerHandler.addMedia(media1);
+//        media1.setTitle("Coco");
+//        media1.setType("Movie"); //you can make the types whatever you want as long as they are consistent
+//        //media1.setProducerId(); no need to set this, the server takes care of it
+//        media1.setDescription("Aspiring musician Miguel, confronted with his family's ancestral ban on music, enters the Land of the Dead to work out the mystery.");
+//        media1.setGenre("Adventure");
+//        media1.setActors("Lee Unkrich; Adrian Molina;  Anthony Gonzalez; Gael García Bernal; Benjamin Bratt;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+//        media1.setImage(new File("resources/Coco_poster.png"));
+//        media1.setShowtimes("Dec 2, 2017 11:00 AM;"); //same with the format and delimination of these
+//        media1.setRating("PG");
+//        media1.setYear(2017);
+//
+//        ServerHandler.addMedia(media1);
+//
+//        media1.setTitle("Planet Earth II");
+//        media1.setType("Show"); //you can make the types whatever you want as long as they are consistent
+//        //media1.setProducerId(); no need to set this, the server takes care of it
+//        media1.setDescription("David Attenborough returns in this breathtaking documentary showcasing life on Planet Earth.");
+//        media1.setGenre("Drama");
+//        media1.setActors("David Attenborough;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+//        media1.setImage(new File("resources/Planet_Earth_II.png"));
+//        media1.setShowtimes("Dec 7, 2017 7:00 AM;"); //same with the format and delimination of these
+//        media1.setRating("G");
+//        media1.setYear(2016);
+//
+//        ServerHandler.addMedia(media1);
+//
+//        media1.setTitle("Star Wars: The Last Jedi");
+//        media1.setType("Movie"); //you can make the types whatever you want as long as they are consistent
+//        //media1.setProducerId(); no need to set this, the server takes care of it
+//        media1.setDescription("Having taken her first steps into the Jedi world, Rey joins Luke Skywalker on an adventure with Leia, Finn and Poe that unlocks mysteries of the Force and secrets of the past. ");
+//        media1.setGenre("Action");
+//        media1.setActors("Rian Johnson; George Lucas; Daisy Ridley; John Boyega; Mark Hamill;"); //you can deliminate these entries any way you would like, just handle it in the client application. It will be stored and retrieved from the database exactly as you save it.
+//        media1.setImage(new File("resources/Star_Wars_Episode_VIII_The_Last_Jedi.png"));
+//        media1.setShowtimes("Dec 15, 2017 12:00 AM;"); //same with the format and delimination of these
+//        media1.setRating("PG-13");
+//        media1.setYear(2017);
+//
+//        ServerHandler.addMedia(media1);
 
 //        media1.setTitle("The Super Show");
 //
