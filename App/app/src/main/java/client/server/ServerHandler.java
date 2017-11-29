@@ -586,10 +586,12 @@ public class ServerHandler extends Application
         String imageType = "";
         try {
             imageDump = Base64.getEncoder().encodeToString(Files.readAllBytes(Paths.get(image.getAbsolutePath())));
+            System.out.println(imageDump);
         } catch (IOException e1) {
             imageDump = "";
         }
         imageType = image.getName().substring(image.getName().indexOf('.') + 1);
+        System.out.println(imageType);
 
         try {
             RequestBody requestBody = new MultipartBuilder().type(MultipartBuilder.FORM)

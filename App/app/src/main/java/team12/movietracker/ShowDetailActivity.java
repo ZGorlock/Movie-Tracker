@@ -131,7 +131,7 @@ public class ShowDetailActivity extends AppCompatActivity {
 
         }
         try{
-            mYear.setText(retrievedMedia.getYear());
+            mYear.setText(String.valueOf(retrievedMedia.getYear()));
 
         }
         catch (Exception e)
