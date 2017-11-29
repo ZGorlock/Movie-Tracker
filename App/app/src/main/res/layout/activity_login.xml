@@ -10,7 +10,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="team12.movietracker.LoginActivity">
 
-
     <!-- Login progress -->
     <ProgressBar
         android:id="@+id/login_progress"
@@ -78,7 +77,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_in"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:textColor="#fff"
+                android:background="@drawable/round_button_corner_submit"/>
 
             <Button
                 android:id="@+id/register_button"
@@ -87,13 +88,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="@string/action_register"
-                android:textStyle="bold" />
-
-         <com.facebook.login.widget.LoginButton
+                android:textStyle="bold"
+                android:textColor="#fff"
+                android:background="@drawable/round_button_corner_submit"/>
+            <com.facebook.login.widget.LoginButton
                 android:id="@+id/FBlogin_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+
                 android:layout_marginTop="30dp"
                 android:layout_marginBottom="30dp" />
 

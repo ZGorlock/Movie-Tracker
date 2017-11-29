@@ -1,36 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:padding="8dp"
-    android:weightSum="3">
+    android:weightSum="3"
+    android:background="#fff">
 
     <ImageView
         android:id="@+id/posterBrowse"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+
         android:adjustViewBounds="true"
-        android:scaleType="fitStart"
+
         app:srcCompat="@drawable/ic_image_black_48dp" />
 
     <TextView
         android:id="@+id/titleBrowse"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
         android:layout_weight="2"
-        android:text="TextView" />
+        android:text="TextView"
+        android:textColor="#000"
+        android:paddingTop="16dp"
+        android:textSize="18sp"
+        android:maxLines="1"
+        android:textStyle="bold"
+        android:layout_toRightOf="@+id/posterBrowse"/>
 
     <TextView
+        android:layout_toRightOf="@+id/posterBrowse"
+        android:textColor="#000"
         android:id="@+id/showtimeBrowse"
-        android:layout_width="64dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="5dp"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
-        android:layout_weight="1"
+        android:layout_below="@+id/titleBrowse"
+        android:textSize="15sp"
+        android:maxLines="1"
+
         android:text="TextView" />
-</LinearLayout>
+
+
+</RelativeLayout>
