@@ -1,18 +1,28 @@
 import React, { Component } from 'react';
 import { Button, Form, Grid, Header, Loader, Message, Segment } from 'semantic-ui-react';
 import { Redirect } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import isEmail from 'validator/lib/isEmail';
 
-import { client } from '../../Client';
+import Client, { client } from '../../Client';
+import { isAlphanumeric } from '../../Validation';
 
 class Signup extends Component {
+  static propTypes = {
+    onLogin: PropTypes.func.isRequired,
+  };
+
   state = {
     fields: {
+      username: '',
       email: '',
+      firstName: '',
+      lastName: '',
       password: '',
       confirmPassword: '',
     },
     fieldErrors: {},
+    formErrors: {},
     signupInProgress: false,
     shouldRedirect: false,
   };
@@ -21,7 +31,14 @@ class Signup extends Component {
     const { fields, fieldErrors } = this.state;
     const { value } = e.target;
     fields[name] = value;
-    fieldErrors[name] = validate(value);
+    const invalid = validate(value);
+
+    if (invalid) {
+      fieldErrors[name] = invalid;
+    } else {
+      delete fieldErrors[name];
+    }
+
     const { password, confirmPassword } = fields;
 
     if (password && confirmPassword && password !== confirmPassword) {
@@ -33,38 +50,98 @@ class Signup extends Component {
     this.setState({ fields, fieldErrors });
   }
 
+  isUsernameValid = (val) => {
+    if (!val) {
+      return 'Username required';
+    }
+    if (val.length > 32) {
+      return 'Username must be less than 32 characters';
+    }
+    if (!isAlphanumeric(val)) {
+      return 'Username contains invalid characters';
+    }
+
+    return false;
+  };
+
   isEmailValid = val => (isEmail(val) ? false : 'Invalid Email');
+  isFirstNameValid = val => (val ? false : 'First name required');
+  isLastNameValid = val => (val ? false : 'Last name required');
   isPasswordValid = val => (val ? false : 'Password required');
   isConfirmPasswordValid = val => (val ? false : 'Password confirmation required');
 
   performSignup = () => {
-    this.setState({ signupInProgress: true });
+    const {
+      username,
+      email,
+      firstName,
+      lastName,
+      password,
+    } = this.state.fields;
+    this.setState({ signupInProgress: true, formErrors: {} });
+    client.signup(username, email, firstName, lastName, password).then((infoResp) => {
+      client.login(username, password).then((tokenResp) => {
+        const token = tokenResp.headers.get('authToken');
+        const userInfo = JSON.parse(infoResp.headers.get('userInfo'));
+        const id = userInfo.userId;
 
-    client.login().then(() => {
-      this.setState({
-        signupInProgress: false,
-        shouldRedirect: true,
-      });
-    });
+        this.setState({
+          shouldRedirect: true,
+        });
+
+        this.props.onLogin(token, id);
+      }).catch(this.handleSignupError);
+    }).catch(this.handleSignupError);
+  }
+
+  handleSignupError = (error) => {
+    const { fieldErrors, formErrors } = this.state;
+    const { username } = this.state.fields;
+
+    switch (error.type) {
+      case Client.SIGNUP_USERNAME_EXISTS: {
+        const message = `Username "${username}" is taken`;
+        fieldErrors.username = message;
+        formErrors.username = message;
+        break;
+      }
+      default:
+        formErrors.server = 'Failed to connect to server';
+    }
+
+    this.setState({ formErrors: {} });
+    this.setState({ fieldErrors, formErrors, signupInProgress: false });
   }
 
   isValid = () => {
     const account = this.state.fields;
     const {
+      username,
       email,
+      firstName,
+      lastName,
       password,
       confirmPassword,
     } = account;
     const { fieldErrors } = this.state;
     const errMessages = Object.keys(fieldErrors).filter(key => fieldErrors[key]);
 
-    return email && password && confirmPassword && !errMessages.length;
+    return username && email && firstName && lastName &&
+      password && confirmPassword && !errMessages.length;
   }
 
+  isFormValid = () => {
+    const { formErrors } = this.state;
+    const errMessages = Object.keys(formErrors).filter(key => formErrors[key]);
 
-  renderErrors() {
-    const { fieldErrors } = this.state;
-    const errMessages = Object.values(fieldErrors).filter(err => err);
+    return !errMessages.length;
+  }
+
+  renderErrors = () => {
+    const { fieldErrors, formErrors } = this.state;
+    const errorsCopy = Object.assign({}, formErrors);
+    const errors = Object.assign(errorsCopy, fieldErrors);
+    const errMessages = Object.values(errors).filter(err => err);
 
     const errComponents = [
       ...errMessages.map(errMessage => (
@@ -106,8 +183,19 @@ class Signup extends Component {
             <Header as="h2" textAlign="center">
               Create a new account.
             </Header>
-            <Form error={hasErrors} size="large">
+            <Form error={hasErrors || !this.isFormValid()} size="large">
               <Segment stacked>
+                <Form.Input
+                  error={this.state.fieldErrors.username}
+                  onChange={this.onInputChange}
+                  name="username"
+                  validate={this.isUsernameValid}
+                  disabled={this.state.signupInProgress}
+                  fluid
+                  icon="user"
+                  iconPosition="left"
+                  placeholder="Username"
+                />
                 <Form.Input
                   error={this.state.fieldErrors.email}
                   name="email"
@@ -115,9 +203,31 @@ class Signup extends Component {
                   validate={this.isEmailValid}
                   disabled={this.state.signupInProgress}
                   fluid
-                  icon="user"
+                  icon="at"
                   iconPosition="left"
                   placeholder="E-mail address"
+                />
+                <Form.Input
+                  error={this.state.fieldErrors.firstName}
+                  onChange={this.onInputChange}
+                  name="firstName"
+                  validate={this.isFirstNameValid}
+                  disabled={this.state.signupInProgress}
+                  fluid
+                  icon="id card"
+                  iconPosition="left"
+                  placeholder="First Name"
+                />
+                <Form.Input
+                  error={this.state.fieldErrors.lastName}
+                  onChange={this.onInputChange}
+                  name="lastName"
+                  validate={this.isLastNameValid}
+                  disabled={this.state.signupInProgress}
+                  fluid
+                  icon="id card outline"
+                  iconPosition="left"
+                  placeholder="Last Name"
                 />
                 <Form.Input
                   error={this.state.fieldErrors.password}

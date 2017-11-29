@@ -1,16 +1,58 @@
 import React, { Component } from 'react';
-import { Button, Card, Header, Icon, Image, Modal, Rating, Statistic } from 'semantic-ui-react';
+import { Button, Icon } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+
+import MediaFormModal from './MediaFormModal';
+import MediaDetailModal from './MediaDetailModal';
 
 class ToggleableMediaDetail extends Component {
-  state = {
-    open: false,
+  static propTypes = {
+    image: PropTypes.string,
+    title: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    genre: PropTypes.string,
+    actors: PropTypes.string,
+    showtimes: PropTypes.string,
+    rating: PropTypes.string,
+    year: PropTypes.string,
   };
 
-  show = () => () => this.setState({ open: true });
-  close = () => this.setState({ open: false })
+  static defaultProps = {
+    image: '',
+    title: '',
+    type: '',
+    description: '',
+    genre: '',
+    actors: '',
+    showtimes: '',
+    rating: '',
+    year: '',
+  };
+
+  state = {
+    isOpen: false,
+    editing: false,
+  };
+
+  onClose = () => this.setState({ isOpen: false })
+  onEdit = () => this.setState({ isOpen: false, editing: true });
+  show = () => () => this.setState({ isOpen: true });
+  closeEdit = () => this.setState({ isOpen: true, editing: false })
 
   render() {
-    const { open } = this.state;
+    const { isOpen, editing } = this.state;
+    const fields = {
+      image: this.props.image,
+      title: this.props.title,
+      type: this.props.type,
+      description: this.props.description,
+      actors: this.props.actors,
+      showtimes: this.props.showtimes,
+      genre: this.props.genre,
+      rating: this.props.rating,
+      year: this.props.year,
+    };
 
     return (
       <div>
@@ -24,70 +66,20 @@ class ToggleableMediaDetail extends Component {
           View Details
         </Button>
 
-        <Modal size="fullscreen" dimmer="blurring" open={open} onClose={this.close}>
-          <Modal.Header>Media Info</Modal.Header>
-          <Modal.Content image>
-            <Image wrapped size="large" src={this.props.image} />
-            <Modal.Description>
-              <Card.Group>
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Title</Card.Header>
-                    <Card.Description>{this.props.title}</Card.Description>
-                  </Card.Content>
-                </Card>
+        <MediaDetailModal
+          isOpen={isOpen}
+          onEdit={this.onEdit}
+          onClose={this.onClose}
+          fields={fields}
+        />
 
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Genre</Card.Header>
-                    <Card.Description>Placeholder Genre</Card.Description>
-                  </Card.Content>
-                </Card>
-            
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Description</Card.Header>
-                    <Card.Description>Placeholder Description</Card.Description>
-                  </Card.Content>
-                </Card>
-
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Actors</Card.Header>
-                    <Card.Description>Placeholder Actors</Card.Description>
-                  </Card.Content>
-                </Card>
-
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Placeholder Rating</Card.Header>
-                    <Rating rating={4} maxRating={5} size="huge" disabled />
-                  </Card.Content>
-                </Card>
-
-                <Card>
-                  <Card.Content>
-                    <Card.Header>Year</Card.Header>
-                    <Card.Description>2017</Card.Description>
-                  </Card.Content>
-                </Card>
-              </Card.Group>
-            </Modal.Description>
-          </Modal.Content>
-          <Modal.Actions>
-            <Button color="red" onClick={this.close}>
-              <Icon name="remove" />
-              Delete
-            </Button>
-            <Button
-              positive
-              icon="edit"
-              labelPosition="right"
-              content="Edit"
-              onClick={this.close}
-            />
-          </Modal.Actions>
-        </Modal>
+        <MediaFormModal
+          isOpen={editing}
+          onClose={this.closeEdit}
+          onCancel={this.closeEdit}
+          onSave={this.closeEdit}
+          initialFields={fields}
+        />
       </div>
     );
   }

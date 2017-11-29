@@ -2,7 +2,9 @@
   "name": "website",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://movie-tracker.dynu.net:4444",
   "dependencies": {
+    "crypto-js": "^3.1.9-1",
     "prop-types": "^15.6.0",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",

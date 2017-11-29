@@ -1,8 +1,9 @@
 import React from 'react';
 import { Container, Menu } from 'semantic-ui-react';
 import { NavLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
-const NavMenu = () => (
+const NavMenu = ({ onLogout }) => (
   <Menu size="large">
     <Container>
       <NavLink
@@ -28,10 +29,10 @@ const NavMenu = () => (
       Help
       </NavLink>
       <Menu.Menu position="right">
-        <Menu.Item>
+        <Menu.Item onClick={onLogout}>
           <NavLink
             className="ui red button"
-            to="/logout"
+            to="/login"
           >
           Logout
           </NavLink>
@@ -40,5 +41,9 @@ const NavMenu = () => (
     </Container>
   </Menu>
 );
+
+NavMenu.propTypes = {
+  onLogout: PropTypes.func.isRequired,
+};
 
 export default NavMenu;

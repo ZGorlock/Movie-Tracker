@@ -1,16 +1,19 @@
 import React from 'react';
-import { Container, Header, Segment } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 import Landing from './Landing';
 import Welcome from './Welcome';
-import { client } from '../../Client';
 
-const Home = () => {
-  if (client.isLoggedIn()) {
+const Home = ({ isLoggedIn }) => {
+  if (isLoggedIn) {
     return <Welcome />;
   }
 
   return <Landing />;
+};
+
+Home.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
 export default Home;

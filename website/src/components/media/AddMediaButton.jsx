@@ -1,9 +1,14 @@
 import React, { Component } from 'react';
 import { Button, Icon } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
 
 import MediaFormModal from './MediaFormModal';
 
 class AddMediaButton extends Component {
+  static propTypes = {
+    authToken: PropTypes.string.isRequired,
+  }
+
   state = {
     isOpen: false,
   };
@@ -38,13 +43,11 @@ class AddMediaButton extends Component {
         </Button>
 
         <MediaFormModal
+          authToken={this.props.authToken}
           isOpen={this.state.isOpen}
           onClose={this.onClose}
           onCancel={this.onCancel}
           onSave={this.onSave}
-          initialFields={{
-            image: 'https://react.semantic-ui.com/assets/images/wireframe/white-image.png',
-          }}
         />
       </div>
     );
