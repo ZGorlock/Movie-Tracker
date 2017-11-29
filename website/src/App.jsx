@@ -8,7 +8,9 @@ import { MediaDashboard } from './components/media';
 import { Login } from './components/login';
 import { Signup } from './components/signup';
 import { Footer, Menu } from './components/navigation';
+import { Help } from './components/help'
 
+<<<<<<< HEAD
 class App extends Component {
   state = {
     isLoggedIn: false,
@@ -65,5 +67,21 @@ class App extends Component {
     );
   }
 }
+=======
+const App = () => (
+  <div>
+    <Menu />
+    <Switch>
+      <Route exact path="/" component={Home} />
+      <Route path="/media" component={MediaDashboard} />
+      <Route path="/signup" component={Signup} />
+      <Route path="/login" component={Login} />
+      <Route path="/logout" component={Logout} />
+      <Route path="/help" component = {Help}/>
+    </Switch>
+    <Footer />
+  </div>
+);
+>>>>>>> b10873c74e9269f00848bd507432ffaa35879210
 
 export default App;
