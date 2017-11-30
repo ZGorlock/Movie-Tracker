@@ -49,7 +49,7 @@ class App extends Component {
           />
           <Route
             path="/media"
-            component={() => <MediaDashboard authToken={token} id={id} />} />
+            component={() => <MediaDashboard authToken={token} producerId={id} />} />
           <Route
             path="/signup"
             component={() => <Signup onLogin={this.onLogin} />}
