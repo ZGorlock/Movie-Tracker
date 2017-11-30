@@ -6,9 +6,11 @@ const MediaDetailModal = ({
   isOpen,
   onEdit,
   onClose,
+  onDelete,
   fields,
 }) => {
   const {
+    imageDump,
     image,
     title,
     type,
@@ -25,7 +27,7 @@ const MediaDetailModal = ({
       <Modal size="fullscreen" dimmer="blurring" open={isOpen} onClose={onClose}>
         <Modal.Header>Media Info</Modal.Header>
         <Modal.Content image>
-          <Image wrapped size="large" src={image} />
+          <Image wrapped size="large" src={`data:image/jpeg;base64,${imageDump}`} />
           <Modal.Description>
             <Card.Group>
               <Card>
@@ -87,7 +89,7 @@ const MediaDetailModal = ({
           </Modal.Description>
         </Modal.Content>
         <Modal.Actions>
-          <Button color="red" onClick={onClose}>
+          <Button color="red" onClick={onDelete}>
             <Icon name="remove" />
             Delete
           </Button>
@@ -118,6 +120,7 @@ MediaDetailModal.propTypes = {
   }),
   isOpen: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
 };
 

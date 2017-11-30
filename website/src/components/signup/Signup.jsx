@@ -82,8 +82,7 @@ class Signup extends Component {
     client.signup(username, email, firstName, lastName, password).then((infoResp) => {
       client.login(username, password).then((tokenResp) => {
         const token = tokenResp.headers.get('authToken');
-        const userInfo = JSON.parse(infoResp.headers.get('userInfo'));
-        const id = userInfo.userId;
+        const id = JSON.parse(infoResp.headers.get('userId'));
 
         this.setState({
           shouldRedirect: true,
