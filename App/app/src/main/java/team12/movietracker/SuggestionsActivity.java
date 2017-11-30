@@ -74,6 +74,7 @@ public class SuggestionsActivity extends AppCompatActivity {
             if(!subscriptions.contains(currentMedia.get(index)))
             {
                 foundValue = false;
+                mMediaID = currentMedia.get(index);
             }
         }
 
@@ -196,7 +197,11 @@ public class SuggestionsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
+
                 startActivity(getIntent());
+////                intent.putExtra("USER",mUsername);
+////                intent.putExtra("PASS",mPassword);
+////                intent.putExtra("MEDIAID",mDetailRecyclerViewAdapter.getSub(position));
             }
         });
 
